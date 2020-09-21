@@ -34,7 +34,7 @@ def handle_events():
             elif e.key == SDLK_RIGHT:
                 dx -= 1
             print('keydown' ,dx)
-        elif e.type == SDL_Quit:
+        elif e.type == SDL_QUIT:
             running = False
         elif e.type == SDL_MOUSEMOTION:
             x,y = e.x,get_canvas_height() - e.y - 1

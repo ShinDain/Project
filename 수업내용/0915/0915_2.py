@@ -1,4 +1,3 @@
-
 from pico2d import *
 
 def handle_events():
