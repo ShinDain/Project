@@ -1,6 +1,6 @@
 # 2017182018 신다인 기말 프로젝트
 
-##1. 게임의 소개
+## 1. 게임의 소개
  - spelunky
  - spelunky는 로그라이크 게임으로, 새롭게 시작할 때마다 지형지물이 변화하고 만약 죽는다면 처음부터 시작한다.
  - 플레이어는 스테이지로 구성된 맵들을 하나 하나 통과해 나가며 진행하게 된다.
@@ -9,7 +9,7 @@
 ![Game Play image2][https://steamcdn-a.akamaihd.net/steam/apps/239350/ss_b2d531be63261ac6627511b8a0ea7fe1c2ddb8b6.1920x1080.jpg]
  - 게임은 죽거나 스테이지의 끝에 도달할 때까지 진행되며, 출구로 나가거나 보스를 처치해야 한다.
 
-##2. GameState (Scene) 의 수 및 각각의 이름
+## 2. GameState (Scene) 의 수 및 각각의 이름
  1. 로고 - LogoState
  2. 메뉴 선택 - TitleState
  3. 스테이지 - StageState
@@ -17,7 +17,7 @@
  5. 사망 - DieState
  6. 일시 정지 - PauseState
 
-##3. 각 GameState 별 다음 항목
+## 3. 각 GameState 별 다음 항목
  1. 로고 - LogoState
  	- 게임의 제목이 등장하는 화면이다.
  	- 게임의 로고 화면, 'Press Any Key' 이미지
@@ -63,7 +63,7 @@
 
 ![Sheet][..\기말 프로젝트\State.png]
 
-##4. 필요한 기술
+## 4. 필요한 기술
 - 애니메이션
 - 시간에 따른 이벤트
 - 키보드 입력
