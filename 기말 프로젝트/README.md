@@ -5,8 +5,8 @@
  - spelunky는 로그라이크 게임으로, 새롭게 시작할 때마다 지형지물이 변화하고 만약 죽는다면 처음부터 시작한다.
  - 플레이어는 스테이지로 구성된 맵들을 하나 하나 통과해 나가며 진행하게 된다.
  - 각 스테이지에는 스테이지 특색에 맞는 함정과 몬스터가 있다.
-![Game Play image1][https://steamcdn-a.akamaihd.net/steam/apps/239350/ss_8fb56a4fb17d6c777c12952d6642652b063b5528.1920x1080.jpg]
-![Game Play image2][https://steamcdn-a.akamaihd.net/steam/apps/239350/ss_b2d531be63261ac6627511b8a0ea7fe1c2ddb8b6.1920x1080.jpg]
+![Game Play image1](https://steamcdn-a.akamaihd.net/steam/apps/239350/ss_8fb56a4fb17d6c777c12952d6642652b063b5528.1920x1080.jpg)
+![Game Play image2](https://steamcdn-a.akamaihd.net/steam/apps/239350/ss_b2d531be63261ac6627511b8a0ea7fe1c2ddb8b6.1920x1080.jpg)
  - 게임은 죽거나 스테이지의 끝에 도달할 때까지 진행되며, 출구로 나가거나 보스를 처치해야 한다.
 
 ## 2. GameState (Scene) 의 수 및 각각의 이름
@@ -61,7 +61,7 @@
   	  방향키 위아래 : 메뉴 이동 
  	- 스테이지에서 esc키를 입력시 출력
 
-![Sheet][..\기말 프로젝트\State.png]
+![Sheet](/기말 프로젝트/State.png)
 
 ## 4. 필요한 기술
 - 애니메이션
