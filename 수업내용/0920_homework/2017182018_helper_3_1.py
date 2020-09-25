@@ -21,8 +21,8 @@ def handle_events():
                 
 
 open_canvas()
-gra = load_image('grass.png')
-ch = load_image('run_animation.png')
+gra = load_image('../res/grass.png')
+ch = load_image('../res/run_animation.png')
 
 pos = 400,85    # 현위치
 target = 0,0
