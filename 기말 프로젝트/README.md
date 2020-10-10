@@ -75,10 +75,10 @@
 - 타일링
 
 ## 5. 게임의 흐름과 구성
-![Sheet](/img/Main.png)
-![Sheet](/img/GameProgress.png)
+![Sheet](/img/Main.PNG)
+![Sheet](/img/GameProgress.PNG)
 
 ## 6. 개발 범위 및 계획
-![Sheet](/img/Width.png)
-![Sheet](/img/Plan.png)
+![Sheet](/img/Width.PNG)
+![Sheet](/img/Plan.PNG)
 
