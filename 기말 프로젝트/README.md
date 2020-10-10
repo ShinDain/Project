@@ -73,3 +73,12 @@
 - 충돌 처리
 - 스크롤링
 - 타일링
+
+## 5. 게임의 흐름과 구성
+![Sheet](/img/Main.png)
+![Sheet](/img/GameProgress.png)
+
+## 6. 개발 범위 및 계획
+![Sheet](/img/Width.png)
+![Sheet](/img/Plan.png)
+
