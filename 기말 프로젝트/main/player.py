@@ -32,9 +32,9 @@ class Player:
         self.mag = 1
 
     def draw(self):
-        width,height = 85,85
+        width,height = 80,80
         sx = self.fidx * width
-        sy = self.action * height
+        sy = self.action * height + 64
         self.image.clip_draw(sx, sy, width, height, *self.pos)
 
     def update(self):
