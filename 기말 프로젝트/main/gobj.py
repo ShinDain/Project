@@ -2,7 +2,10 @@ import random
 from pico2d import *
 import gfw
 
-RES_DIR = './res'
+RES_DIR = './res/'
+
+def res(file):
+	return RES_DIR + file
 
 def rand(val):
     return val * random.uniform(0.9, 1.1)
@@ -38,6 +41,20 @@ def draw_collision_box():
 	for obj in gfw.world.all_objects():
 		if hasattr(obj, 'get_bb'):
 			draw_rectangle(*obj.get_bb())
+
+def mouse_xy(event):
+    return event.x, get_canvas_height() - event.y - 1
+
+def pt_in_rect(point, rect):
+    (x, y) = point
+    (l, b, r, t) = rect
+
+    if x < l: return False
+    if x > r: return False
+    if y < b: return False
+    if y > t: return False
+
+    return True
 
 class ImageObject:
 	def __init__(self, imageName, pos):

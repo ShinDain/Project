@@ -25,7 +25,7 @@ def draw():
     
 def handle_event(e):
     global player
-    # prev_dx = boy.dx0
+    # prev_dx = boy.dx0 
     if e.type == SDL_QUIT:
         gfw.quit()
     elif e.type == SDL_KEYDOWN:
