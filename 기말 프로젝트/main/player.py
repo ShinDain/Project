@@ -2,6 +2,7 @@ import random
 from pico2d import *
 import gfw
 import gobj
+import tile
 
 class Player:
     KEY_MAP = {
@@ -49,7 +50,7 @@ class Player:
     def __init__(self):
         self.pos = get_canvas_width() // 4, get_canvas_height() // 4
         self.dx = 0
-        self.dy = 0
+        self.jump_speed = 0
         self.speed = 200
         self.image = gfw.image.load(gobj.RES_DIR + '/Player.png')
         self.time = 0
@@ -87,34 +88,62 @@ class Player:
 
     def jump(self):
         if self.state == Player.FALLING: return
+        if self.state == Player.JUMP: return
         if self.state == Player.IDLE:
             self.state = Player.JUMP
         if self.state == Player.MOVE:
             self.state = Player.JUMP
-
-        self.dy += 1.5
+        
+        self.jump_speed += 1.5
 
     def update(self):
         x,y = self.pos
         x += self.dx * self.speed * self.mag * gfw.delta_time
-        y += self.dy * self.speed * gfw.delta_time
+        y += self.jump_speed * self.speed * gfw.delta_time
         
-        if self.state is Player.FALLING:
-            self.dy -= Player.Gravity * gfw.delta_time
-            if self.dy < -1.5:
-                if self.dx is 0:self.state = Player.IDLE
-                else: self.state = Player.MOVE
-                self.dy = 0
-        elif self.state is Player.JUMP:
-            self.dy -= Player.Gravity * gfw.delta_time
-            if self.dy <= 0:
-                self.state = Player.FALLING
+        if self.state in [Player.FALLING, Player.JUMP]:
+            self.jump_speed -= Player.Gravity * gfw.delta_time   # 중력 적용
+        _,foot,_,_ = self.get_bb()                      # 바닥 체크
+        tile = self.get_tile(foot)
+        if tile is not None:
+            l,b,r,t = tile.get_bb()
+            if self.state in [Player.MOVE, Player.IDLE, Player.JUMP]:
+                if foot > t:
+                    self.state = Player.FALLING
+                    self.jump_speed = 0
+            else:
+                # print('falling', t, foot)
+                if self.jump_speed < 0 and int(foot) <= t:
+                    self.pos = gobj.point_add(self.pos, (0, t - foot))
+                    self.state = Player.MOVE
+                    self.jump_speed = 0
+                    # print('Now running', t, foot)
 
         self.pos = x,y
         self.time += gfw.delta_time
 
-        if self.dx is 0 and self.dy is 0:
+        if self.dx is 0 and self.jump_speed is 0:
             self.state = Player.IDLE
+
+    def get_tile(self, foot):
+        selected = None
+        sel_top = 0
+        x,y = self.pos
+        for tile in gfw.world.objects_at(gfw.layer.tile):
+            l,b,r,t = tile.get_bb()
+            if x < l or x > r: continue
+            mid = (b + t) // 2
+            if foot < mid: continue
+            if selected is None:
+                selected = tile
+                sel_top = t
+            else:
+                if t > sel_top:
+                    selected = tile
+                    sel_top = t
+        # if selected is not None:
+        #     print(l,b,r,t, selected)
+        return selected
 
     def handle_event(self, e):
         pair = (e.type, e.key)
@@ -141,7 +170,7 @@ class Player:
             self.jump()
 
     def get_bb(self):
-        hw = 20
+        hw = 40
         hh = 40
         x,y = self.pos
         return x - hw, y - hh, x + hw, y + hh

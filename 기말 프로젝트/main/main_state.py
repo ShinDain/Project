@@ -2,12 +2,13 @@ import gfw
 from player import Player
 from pico2d import *
 import gobj
+import stage_gen
 
-canvas_width = 1280
-canvas_height = 960
+canvas_width = 1000
+canvas_height = 800
 
 def enter():
-    gfw.world.init(['bg', 'player'])
+    gfw.world.init(['bg','tile','player'])
     global player
     player = Player()
     gfw.world.add(gfw.layer.player, player)
@@ -15,10 +16,11 @@ def enter():
     bg = gobj.ImageObject('kpu_1280x960.png', (canvas_width // 2, canvas_height // 2))
     gfw.world.add(gfw.layer.bg, bg)
 
+    stage_gen.load(gobj.res('stages/stage_type0.txt'))
 
-def update():
+def update(): 
     gfw.world.update()
-
+    stage_gen.update()
 def draw():
     gfw.world.draw()
     # gobj.draw_collision_box()
