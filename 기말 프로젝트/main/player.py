@@ -16,6 +16,7 @@ class Player:
         (SDL_KEYUP, SDLK_UP):      ( 0, -1),
     }
     KEYDOWN_SPACE  = (SDL_KEYDOWN, SDLK_SPACE)
+    KEYUP_SPACE  = (SDL_KEYUP, SDLK_SPACE)
     KEYDOWN_LSHIFT = (SDL_KEYDOWN, SDLK_LSHIFT)
     KEYUP_LSHIFT   = (SDL_KEYUP,   SDLK_LSHIFT)
     image = None
@@ -44,19 +45,21 @@ class Player:
     STUN_DEATH, GRAB_WALL, ATTACK, THROW, LOOKUP, JUMP, \
     FALLING, PUSHING, ROPE_MOVE, OUT_STAGE, IN_STAGE = range(17)
 
-    Gravity = 2
+    Gravity = 7
 
     #constructor
     def __init__(self):
         self.pos = get_canvas_width() // 4, get_canvas_height() // 4
         self.dx = 0
         self.jump_speed = 0
+        self.jumpon = False
+        self.jump_time = 0
         self.speed = 200
         self.image = gfw.image.load(gobj.RES_DIR + '/Player.png')
         self.time = 0
-        self.mag = 1
+        self.mag = 2
         self.pdx = 0
-        self.FPS = 10
+        self.FPS = 20
         self.state = Player.IDLE;
         self.size = 80
         self.look_left = False;
@@ -88,36 +91,29 @@ class Player:
 
     def jump(self):
         if self.state == Player.FALLING: return
-        if self.state == Player.JUMP: return
-        if self.state == Player.IDLE:
+        if self.state in [Player.IDLE,Player.MOVE]:
             self.state = Player.JUMP
-        if self.state == Player.MOVE:
-            self.state = Player.JUMP
-        
-        self.jump_speed += 1.5
-
+        else:
+            pass
     def update(self):
+        if(self.jumpon == True and self.jump_time < 0.3):
+            self.get_floor()
+            self.jump_time += gfw.delta_time
+        else:
+            self.jump_time = 0
+            self.jumpon = False
+
         x,y = self.pos
         x += self.dx * self.speed * self.mag * gfw.delta_time
         y += self.jump_speed * self.speed * gfw.delta_time
         
         if self.state in [Player.FALLING, Player.JUMP]:
             self.jump_speed -= Player.Gravity * gfw.delta_time   # 중력 적용
-        _,foot,_,_ = self.get_bb()                      # 바닥 체크
+        left,foot,right,_ = self.get_bb()                      # 바닥 체크
         tile = self.get_tile(foot)
+        wall = self.get_wall(left,right)
         if tile is not None:
-            l,b,r,t = tile.get_bb()
-            if self.state in [Player.MOVE, Player.IDLE, Player.JUMP]:
-                if foot > t:
-                    self.state = Player.FALLING
-                    self.jump_speed = 0
-            else:
-                # print('falling', t, foot)
-                if self.jump_speed < 0 and int(foot) <= t:
-                    self.pos = gobj.point_add(self.pos, (0, t - foot))
-                    self.state = Player.MOVE
-                    self.jump_speed = 0
-                    # print('Now running', t, foot)
+            self.tile_check(tile,foot)
 
         self.pos = x,y
         self.time += gfw.delta_time
@@ -132,8 +128,8 @@ class Player:
         for tile in gfw.world.objects_at(gfw.layer.tile):
             l,b,r,t = tile.get_bb()
             if x < l or x > r: continue
-            mid = (b + t) // 2
-            if foot < mid: continue
+            gab = (b + t) // 2 + 20
+            if foot < gab: continue
             if selected is None:
                 selected = tile
                 sel_top = t
@@ -144,6 +140,64 @@ class Player:
         # if selected is not None:
         #     print(l,b,r,t, selected)
         return selected
+
+    def tile_check(self, tile,foot):
+        tmpx , tmpy = 0,0
+        l,b,r,t = tile.get_bb()
+        if foot > t:
+            self.state = Player.FALLING
+        else:
+            # print('falling', t, foot)
+            if self.jump_speed <= 0 and int(foot) < t:
+                tmpx, tmpy = gobj.point_add(self.pos, (0, t - foot))
+                self.state = Player.MOVE
+                self.jump_speed = 0
+                # print('Now running', t, foot)
+        return tmpx , tmpy
+
+    def get_wall(self, left, right):
+        P_left,_,P_right,_ = self.get_bb()
+        _,P_y = self.pos
+        for tile in gfw.world.objects_at(gfw.layer.tile):
+            l,b,r,t = tile.get_bb()
+            if P_y > b + 10 and P_y < t - 10:
+                print(self.mag)
+                if P_right <= l and P_right >= l - 5 and self.look_left == False:
+                    self.mag = 0
+                elif P_left >= r and P_left <= r + 5 and self.look_left == True:
+                    self.mag = 0
+
+        selected = None
+        sel_top = 0
+        x,y = self.pos
+        for tile in gfw.world.objects_at(gfw.layer.tile):
+            l,b,r,t = tile.get_bb()
+            if x < l or x > r: continue
+            gab = (b + t) // 2 + 20
+            if foot < gab: continue
+            if selected is None:
+                selected = tile
+                sel_top = t
+            else:
+                if t > sel_top:
+                    selected = tile
+                    sel_top = t
+        # if selected is not None:
+        #     print(l,b,r,t, selected)
+        return selected
+
+    def get_floor(self):
+        _,_,_,P_top = self.get_bb()
+        P_x,_ = self.pos
+        for tile in gfw.world.objects_at(gfw.layer.tile):
+            l,b,r,t = tile.get_bb()
+            if P_x > l and P_x < r:
+                print(l, r)
+                if P_top < b:
+                    self.jump_speed = 1.5
+                else:
+                    if self.jump_speed > 0:
+                        self.jump_speed = 0
 
     def handle_event(self, e):
         pair = (e.type, e.key)
@@ -159,18 +213,18 @@ class Player:
             elif self.dx is 1:
                 self.look_left = False
                 self.move()
+            if self.mag == 0:
+                self.mag = 2
         # print(dx, pdx, self.action)
-        elif pair == Player.KEYDOWN_LSHIFT:
-            self.mag *= 2
-            self.FPS *= 2
-        elif pair == Player.KEYUP_LSHIFT:
-            self.mag //= 2
-            self.FPS //= 2
         elif pair == Player.KEYDOWN_SPACE:
             self.jump()
+            if(self.state != Player.FALLING):
+                self.jumpon = True
+        elif pair == Player.KEYUP_SPACE:
+            self.jumpon = False
 
     def get_bb(self):
-        hw = 40
-        hh = 40
+        hw = 24
+        hh = 28
         x,y = self.pos
         return x - hw, y - hh, x + hw, y + hh

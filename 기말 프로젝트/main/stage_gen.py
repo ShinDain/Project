@@ -4,8 +4,8 @@ from tile import tile
 import gobj
 
 UNIT_PER_LINE = 10
-SCREEN_LINES = 8
-BLOCK_SIZE = 80
+SCREEN_LINES = 9
+BLOCK_SIZE = 64
 
 lines = []
 
@@ -21,42 +21,44 @@ def count():
     return len(lines) // SCREEN_LINES * UNIT_PER_LINE
 
 def update():
-    global current_x, create_at
-    while current_x < create_at: 
+    global current_x, create_at, map_index
+    while map_index < 1: 
         create_column()
 
 def create_column():
     global current_x, map_index
-    y = BLOCK_SIZE;
-    for row in range(SCREEN_LINES):
+    y = 0;
+    for row in range(SCREEN_LINES + 1):
         ch = get(map_index, row)
         create_object(ch, current_x, y)
+        current_x = 0
         y += BLOCK_SIZE
-    current_x += BLOCK_SIZE
     map_index += 1
     print('map_index:', map_index)
 
 def create_object(ch, x, y):
-    if ch == '1':
-        obj = tile('cave_block', x, y)
-        gfw.world.add(gfw.layer.tile, obj)
-    elif ch == 'A':
-        y -= int(BLOCK_SIZE) // 2
-        x -= BLOCK_SIZE // 2
-        obj = tile('arrow_block', x, y)
-        gfw.world.add(gfw.layer.tile, obj)
-    elif ch == 'L':
-        y -= int(BLOCK_SIZE) // 2
-        x -= BLOCK_SIZE // 2
-        obj = tile('ledder_bottom', x, y)
-        gfw.world.add(gfw.layer.tile, obj)
-    else:
-        pass
+    for i in range(len(ch)):
+        if ch[i] == '1':
+            obj = tile('cave_block', x, y)
+            gfw.world.add(gfw.layer.tile, obj)
+            x += BLOCK_SIZE
+        elif ch[i] == 'A':
+            obj = tile('arrow_block', x, y)
+            gfw.world.add(gfw.layer.tile, obj)
+            x += BLOCK_SIZE
+        elif ch[i] == 'L':
+            obj = tile('ledder_bottom', x, y)
+            gfw.world.add(gfw.layer.tile, obj)
+            x += BLOCK_SIZE
+        else:
+            x += BLOCK_SIZE
+            pass
 
 def get(x, y):
     col = x % UNIT_PER_LINE
-    row = x // UNIT_PER_LINE * SCREEN_LINES + SCREEN_LINES - 1 - y
-    return lines[row][col]
+    row = x // UNIT_PER_LINE + SCREEN_LINES - y - 1
+    print('lines[row] = ', lines[row])
+    return lines[row]
 
 def test_gen():
     load(gobj.res('stages/stage_type0.txt'))
@@ -73,8 +75,12 @@ def test_gen_2():
     open_canvas()
     gfw.world.init(['tile'])
     load(gobj.res('stages/stage_type0.txt'))
+
+    print('count=', count())
+
     for i in range(100):
         update()
+
     close_canvas()
 
 if __name__ == '__main__':

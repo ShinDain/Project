@@ -19,7 +19,7 @@ class tile:
         load()
         self.left = left
         self.bottom = bottom
-        self.unit = 80
+        self.unit = 64
         self.rect = tile_rects[name]
     def update(self): pass
     def draw(self):

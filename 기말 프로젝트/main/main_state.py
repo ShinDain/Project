@@ -23,7 +23,7 @@ def update():
     stage_gen.update()
 def draw():
     gfw.world.draw()
-    # gobj.draw_collision_box()
+    gobj.draw_collision_box()
     
 def handle_event(e):
     global player
