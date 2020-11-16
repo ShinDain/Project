@@ -49,7 +49,7 @@ class Player:
 
     #constructor
     def __init__(self):
-        self.pos = get_canvas_width() // 4, get_canvas_height() // 4
+        self.pos = 240,360
         self.dx = 0
         self.jump_speed = 0
         self.jumpon = False
@@ -58,7 +58,6 @@ class Player:
         self.image = gfw.image.load(gobj.RES_DIR + '/Player.png')
         self.time = 0
         self.mag = 2
-        self.pdx = 0
         self.FPS = 20
         self.state = Player.IDLE;
         self.size = 80
@@ -71,8 +70,12 @@ class Player:
     def state(self, state):
         self.__state = state
         self.anim = Player.Animation[state]
-    def draw(self):    
+    def draw(self):
         fidx = round(self.time * self.FPS) % len(self.anim)
+        if self.state in [Player.LOOKUP,Player.CROUCH, Player.FALLING]:
+            fidx = len(self.anim) - 1
+
+        print(fidx)
         sprite_num = self.anim[fidx]
 
         sx, sy = sprite_num % 0x10, sprite_num // 0x10
@@ -85,7 +88,9 @@ class Player:
             self.image.clip_composite_draw(sx, sy, self.size, self.size, 0 , 'h', *self.pos , 80,80)
 
     def move(self):
-        if self.state != Player.IDLE: return
+        if self.state is not Player.IDLE: return
+        elif self.state is Player.CROUCH:
+            self.state = Player.CROUCH_MOVE
         else:
             self.state = Player.MOVE
 
@@ -96,6 +101,9 @@ class Player:
         else:
             pass
     def update(self):
+        left,foot,right,_ = self.get_bb()                      # 바닥 체크
+        tile = self.get_tile(foot)
+        wall = self.get_wall(left,right)
         self.get_floor()
         
         x,y = self.pos
@@ -104,18 +112,16 @@ class Player:
         
         if self.state in [Player.FALLING, Player.JUMP]:
             self.jump_speed -= Player.Gravity * gfw.delta_time   # 중력 적용
-        left,foot,right,_ = self.get_bb()                      # 바닥 체크
-        tile = self.get_tile(foot)
-        wall = self.get_wall(left,right)
+        
         dy = 0
         if tile is not None:
             dy = self.tile_check(tile,foot)
             y += dy
+
         self.wall_check(wall,left,right)
 
-        if self.state is not Player.FALLING:
-            self.FPS = 20
-
+        if self.state in [Player.FALLING, Player.JUMP]:
+            self.FPS = 10
         self.pos = x,y
         self.time += gfw.delta_time
 
@@ -139,7 +145,6 @@ class Player:
             if y + 20 < b:
                 pass
             else:
-                print(y, b)
                 if self.jump_speed > 0:
                     self.jump_speed = 0
                     self.jumpon = False
@@ -169,8 +174,10 @@ class Player:
         l,b,r,t = tile.get_bb()
         dy = 0
         if foot > t:
-            self.state = Player.FALLING
-            self.FPS = 10
+            if self.jump_speed > 0:
+                self.state = Player.JUMP
+            else:
+                self.state = Player.FALLING
         else:
             # print('falling', t, foot)
             if self.jump_speed <= 0 and int(foot) < t:
@@ -205,11 +212,7 @@ class Player:
     def handle_event(self, e):
         pair = (e.type, e.key)
         if pair in Player.KEY_MAP:
-            if e.type is SDL_KEYUP:
-                self.pdx = self.dx
             self.dx += Player.KEY_MAP[pair][0]
-            if e.type is SDL_KEYDOWN:
-                self.pdx = self.dx
             if self.dx is -1:
                 self.look_left = True
                 self.move()
