@@ -59,9 +59,11 @@ class Player:
         self.time = 0
         self.mag = 2
         self.FPS = 20
-        self.state = Player.IDLE;
+        self.state = Player.IDLE
         self.size = 80
-        self.look_left = False;
+        self.look_left = False
+
+        self.fidx_max = False
         
     @property
     def state(self):
@@ -72,10 +74,15 @@ class Player:
         self.anim = Player.Animation[state]
     def draw(self):
         fidx = round(self.time * self.FPS) % len(self.anim)
-        if self.state in [Player.LOOKUP,Player.CROUCH, Player.FALLING]:
-            fidx = len(self.anim) - 1
 
-        print(fidx)
+        if self.state in [Player.LOOKUP,Player.CROUCH, Player.FALLING] and fidx == len(self.anim) - 1:
+            self.fidx_max = True
+            fidx = len(self.anim) - 1
+        elif self.state in [Player.LOOKUP,Player.CROUCH, Player.FALLING] and self.fidx_max is True:
+            fidx = len(self.anim) - 1
+        else:
+            self.fidx_max = False
+
         sprite_num = self.anim[fidx]
 
         sx, sy = sprite_num % 0x10, sprite_num // 0x10
@@ -129,7 +136,7 @@ class Player:
             self.state = Player.IDLE
 
     def get_floor(self):
-        if(self.jumpon == True and self.jump_time < 0.3):
+        if self.jumpon == True and self.jump_time < 0.3:
             self.jump_speed = 1.5
             self.jump_time += gfw.delta_time
         else:
