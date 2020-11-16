@@ -2,6 +2,7 @@ import gfw
 from pico2d import *
 from tile import tile
 import gobj
+import random
 
 UNIT_PER_LINE = 10
 SCREEN_LINES = 9
@@ -14,7 +15,7 @@ def load(file):
     with open(file, 'r') as f:
         lines = f.readlines()
     current_x = 0
-    map_index = 0
+    map_index = random.randint(0,9)
     create_at = get_canvas_width() + 2 * BLOCK_SIZE
 
 def count():
@@ -22,18 +23,16 @@ def count():
 
 def update():
     global current_x, create_at, map_index
-    while map_index < 1: 
-        create_column()
+    create_column()
 
 def create_column():
     global current_x, map_index
     y = 0;
-    for row in range(SCREEN_LINES + 1):
+    for row in range(SCREEN_LINES):
         ch = get(map_index, row)
         create_object(ch, current_x, y)
         current_x = 0
         y += BLOCK_SIZE
-    map_index += 1
     print('map_index:', map_index)
 
 def create_object(ch, x, y):
@@ -56,7 +55,7 @@ def create_object(ch, x, y):
 
 def get(x, y):
     col = x % UNIT_PER_LINE
-    row = x // UNIT_PER_LINE + SCREEN_LINES - y - 1
+    row = x * SCREEN_LINES + SCREEN_LINES - y - 1
     print('lines[row] = ', lines[row])
     return lines[row]
 
