@@ -113,6 +113,9 @@ class Player:
             y += dy
         self.wall_check(wall,left,right)
 
+        if self.state is not Player.FALLING:
+            self.FPS = 20
+
         self.pos = x,y
         self.time += gfw.delta_time
 
@@ -167,6 +170,7 @@ class Player:
         dy = 0
         if foot > t:
             self.state = Player.FALLING
+            self.FPS = 10
         else:
             # print('falling', t, foot)
             if self.jump_speed <= 0 and int(foot) < t:
@@ -194,9 +198,9 @@ class Player:
             elif self.look_left is not True and l < right and l > left:
                 self.mag = 0
             else:
-                self.mag = self.FPS // 10
+                self.mag = 2
         else:
-            self.mag = self.FPS // 10
+            self.mag = 2
 
     def handle_event(self, e):
         pair = (e.type, e.key)

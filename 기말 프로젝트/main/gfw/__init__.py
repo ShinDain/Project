@@ -8,7 +8,7 @@ import gfw.font
 
 running = True
 stack = None
-frame_interval = 0.01
+frame_interval = 0.0005
 delta_time = 0
 
 def quit():
