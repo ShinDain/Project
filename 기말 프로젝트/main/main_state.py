@@ -18,7 +18,7 @@ def enter():
 
     stage_gen.load(gobj.res('stages/stage_type0.txt'))
 
-def update(): 
+def update():
     gfw.world.update()
     stage_gen.update()
 def draw():
