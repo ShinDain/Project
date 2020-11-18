@@ -20,6 +20,7 @@ class tile:
         self.left = left
         self.bottom = bottom
         self.unit = 64
+        self.name = name
         self.rect = tile_rects[name]
     def update(self): pass
     def draw(self):

@@ -15,6 +15,8 @@ class Player:
         (SDL_KEYUP, SDLK_DOWN):    ( 0,  1),
         (SDL_KEYUP, SDLK_UP):      ( 0, -1),
     }
+    KETDOWN_Z = (SDL_KEYDOWN, SDLK_z)
+    KETDOWN_X = (SDL_KEYDOWN, SDLK_x)
     KEYDOWN_SPACE  = (SDL_KEYDOWN, SDLK_SPACE)
     KEYUP_SPACE  = (SDL_KEYUP, SDLK_SPACE)
     KEYDOWN_LSHIFT = (SDL_KEYDOWN, SDLK_LSHIFT)
@@ -45,7 +47,7 @@ class Player:
     STUN_DEATH, GRAB_WALL, ATTACK, THROW, LOOKUP, JUMP, \
     FALLING, PUSHING, ROPE_MOVE, OUT_STAGE, IN_STAGE = range(17)
 
-    Gravity = 7
+    Gravity = 8
 
     #constructor
     def __init__(self):
@@ -129,6 +131,20 @@ class Player:
         self.change_speed()
         # self.player.pos = point_add(self.player.pos, self.player.delta)
 
+    def get_ledder(self):
+        x,y = self.pos
+        for tile in gfw.world.objects_at(gfw.layer.tile):
+            l,b,r,t = tile.get_bb()
+            if tile.name == 'ledder_bottom' or tile.name == 'ledder_top':
+                if tile:
+                    pass
+                else:
+                    if self.jump_speed > 0:
+                        self.jump_speed = 0
+                        self.jumpon = False
+                        self.jump_time = 0
+            else: continue
+
     def get_floor(self):
         if self.jumpon == True and self.jump_time < 0.3:
             self.jump_speed = 1.5
@@ -139,6 +155,7 @@ class Player:
 
         x, y = self.pos
         for tile in gfw.world.objects_at(gfw.layer.tile):
+            if tile.name == 'ledder_bottom' or tile.name == 'ledder_top': continue
             l,b,r,t = tile.get_bb()
             if x > r or x < l: continue
             gab = (b + t) // 2
@@ -156,6 +173,7 @@ class Player:
         sel_top = 0
         x,y = self.pos
         for tile in gfw.world.objects_at(gfw.layer.tile):
+            if tile.name == 'ledder_bottom': continue
             l,b,r,t = tile.get_bb()
             if x < l or x > r: continue
             gab = (b + t) // 2 + 10
@@ -192,6 +210,7 @@ class Player:
         selected = None
         _,y = self.pos
         for tile in gfw.world.objects_at(gfw.layer.tile):
+            if tile.name == 'ledder_bottom' or tile.name == 'ledder_top': continue
             l,b,r,t = tile.get_bb()
             if y > t or y < b: continue
             if right < l or left > r: continue
