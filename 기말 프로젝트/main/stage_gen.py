@@ -15,7 +15,7 @@ def load(file):
     with open(file, 'r') as f:
         lines = f.readlines()
     current_x = 0
-    map_index = 0 #random.randint(0,9)
+    map_index = random.randint(0,9)
     create_at = get_canvas_width() + 2 * BLOCK_SIZE
 
 def count():

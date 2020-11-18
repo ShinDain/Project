@@ -97,10 +97,11 @@ class Player:
         tile = self.get_tile(foot)
         wall = self.get_wall(left,right)
         self.get_floor()
-        #self.get_ledder()
+        dx = self.get_ledder()
 
         x,y = self.pos
-        x += self.dx * self.speed * self.mag * gfw.delta_time
+        if self.state is not Player.ROPE_MOVE:
+            x += self.dx * self.speed * self.mag * gfw.delta_time
         y += self.jump_speed * self.speed * gfw.delta_time
         
         if self.state in [Player.FALLING, Player.JUMP]:
@@ -110,13 +111,14 @@ class Player:
         if tile is not None:
             dy = self.tile_check(tile,foot)
             y += dy
+
+        x += dx
         self.wall_check(wall,left,right)
 
         self.pos = x,y
         self.time += gfw.delta_time
 
         self.state_check()
-        
 
         if self.state in [Player.LOOKUP,Player.CROUCH, Player.FALLING, Player.JUMP] and self.fidx == len(self.anim) - 1:
             self.fidx = len(self.anim) - 1
@@ -129,21 +131,43 @@ class Player:
         # self.player.pos = point_add(self.player.pos, self.player.delta)
 
     def get_ledder(self):
+        dx = 0
         x,y = self.pos
+        _,P_bottom,_,_ = self.get_bb()
         for tile in gfw.world.objects_at(gfw.layer.tile):
             l,b,r,t = tile.get_bb()
-            if tile.name == 'ledder_bottom' or tile.name == 'ledder_top':
-                if x < l or x > r: continue
-                if y < b or y > t: continue
+            if self.rope_on is True:     
                 if self.crouch == 1:
-                    self.rope_on = True
                     self.jump_speed = 1
+                    if y > t: 
+                        self.rope_on = False
                 elif self.crouch == -1:
-                    self.rope_on = True
                     self.jump_speed = -1
-                elif self.crouch == 0 and self.rope_on is True:
+                else:
                     self.time = 0
                     self.jump_speed = 0
+            else:
+                if tile.name == 'ledder_bottom':
+                    if x < l or x > r: continue
+                    if y < b or y > t: continue
+                    if self.crouch == 1:
+                        self.rope_on = True
+                        self.jump_speed = 1
+                        dx = l + tile.unit // 2 - x
+                elif tile.name == 'ledder_top':
+                    if x < l or x > r: continue
+                    if y > b and y < t + tile.unit:
+                        if self.crouch == -1:
+                            self.rope_on = True
+                            self.jump_speed = -1
+                            dx = l + tile.unit // 2 - x
+                    if y < b or y > t: continue
+                    if self.crouch == 1:
+                        self.rope_on = True
+                        self.jump_speed = 1
+                        dx = l + tile.unit // 2 - x
+        return dx
+
 
     def get_floor(self):
         if self.jump_on == True and self.jump_time < 0.3:
@@ -174,9 +198,10 @@ class Player:
         x,y = self.pos
         for tile in gfw.world.objects_at(gfw.layer.tile):
             if tile.name == 'ledder_bottom': continue
+            if tile.name == 'ledder_top' and self.rope_on is True: continue
             l,b,r,t = tile.get_bb()
-            if x < l or x > r: continue
-            gab = (b + t) // 2 + 10
+            if x < l - 15 or x > r + 15: continue
+            gab = (b + t) // 2 + 5
             if foot < gab: continue
             if selected is None:
                 selected = tile
@@ -203,6 +228,7 @@ class Player:
                 dy = t - foot
                 self.state = Player.MOVE
                 self.jump_speed = 0
+                self.rope_on = False
                 # print('Now running', t, foot)
         return dy
 
@@ -235,8 +261,7 @@ class Player:
             self.time = 0
             if self.state is Player.CROUCH_MOVE:
                 self.fidx = 2
-            if self.rope_on is False:
-                self.dx += Player.KEY_MAP[pair][0]
+            self.dx += Player.KEY_MAP[pair][0]
             self.crouch += Player.KEY_MAP[pair][1]
         # print(dx, pdx, self.action)
         elif pair == Player.KEYDOWN_SPACE:
@@ -254,12 +279,10 @@ class Player:
             return
 
     def jump(self):
-        if self.state == Player.FALLING: return
-        if self.state in [Player.IDLE,Player.MOVE]:
+        if self.state in [Player.JUMP, Player.FALLING]: return
+        else:
             self.state = Player.JUMP
             self.jump_on = True
-        else:
-            pass
 
     def state_check(self):
         if self.dx is 0 and self.jump_speed is 0:
