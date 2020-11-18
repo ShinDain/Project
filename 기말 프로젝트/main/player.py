@@ -96,8 +96,9 @@ class Player:
         left,foot,right,_ = self.get_bb()                      # 바닥 체크
         tile = self.get_tile(foot)
         wall = self.get_wall(left,right)
-        self.get_floor()
         dx = self.get_ledder()
+        self.get_floor()
+
 
         x,y = self.pos
         if self.state is not Player.ROPE_MOVE:
@@ -178,19 +179,21 @@ class Player:
             self.jump_on = False
 
         x, y = self.pos
+        _,_,_,P_top = self.get_bb()
         for tile in gfw.world.objects_at(gfw.layer.tile):
             if tile.name == 'ledder_bottom' or tile.name == 'ledder_top': continue
             l,b,r,t = tile.get_bb()
             if x > r or x < l: continue
             gab = (b + t) // 2
             if y > gab: continue
-            if y + 20 < b:
+            if P_top < b:
                 pass
             else:
                 if self.jump_speed > 0:
                     self.jump_speed = 0
                     self.jump_on = False
                     self.jump_time = 0
+
 
     def get_tile(self, foot):
         selected = None
@@ -200,7 +203,7 @@ class Player:
             if tile.name == 'ledder_bottom': continue
             if tile.name == 'ledder_top' and self.rope_on is True: continue
             l,b,r,t = tile.get_bb()
-            if x < l - 15 or x > r + 15: continue
+            if x < l - 8 or x > r + 8: continue
             gab = (b + t) // 2 + 5
             if foot < gab: continue
             if selected is None:
