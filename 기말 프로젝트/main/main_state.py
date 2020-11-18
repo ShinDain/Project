@@ -16,7 +16,7 @@ def enter():
     bg = gobj.ImageObject('kpu_1280x960.png', (canvas_width // 2, canvas_height // 2))
     gfw.world.add(gfw.layer.bg, bg)
 
-    stage_gen.load(gobj.res('stages/stage_type1.txt'))
+    stage_gen.load(gobj.res('stages/stage_type0.txt'))
     stage_gen.update()
 
 def update():
@@ -39,21 +39,21 @@ def handle_event(e):
                 gfw.world.remove(tile)
             stage_gen.load(gobj.res('stages/stage_type0.txt'))
             stage_gen.update()
-        elif e.key == SDLK_8:
-            for tile in gfw.world.objects_at(gfw.layer.tile):
-                gfw.world.remove(tile)
-            stage_gen.load(gobj.res('stages/stage_type1.txt'))
-            stage_gen.update()
-        elif e.key == SDLK_9:
-            for tile in gfw.world.objects_at(gfw.layer.tile):
-                gfw.world.remove(tile)
-            stage_gen.load(gobj.res('stages/stage_type2.txt'))
-            stage_gen.update()
-        elif e.key == SDLK_0:
-            for tile in gfw.world.objects_at(gfw.layer.tile):
-                gfw.world.remove(tile)
-            stage_gen.load(gobj.res('stages/stage_type3.txt'))
-            stage_gen.update()
+        #elif e.key == SDLK_8:
+        #    for tile in gfw.world.objects_at(gfw.layer.tile):
+        #        gfw.world.remove(tile)
+        #    stage_gen.load(gobj.res('stages/stage_type1.txt'))
+        #    stage_gen.update()
+        #elif e.key == SDLK_9:
+        #    for tile in gfw.world.objects_at(gfw.layer.tile):
+        #       gfw.world.remove(tile)
+        #    stage_gen.load(gobj.res('stages/stage_type2.txt'))
+        #    stage_gen.update()
+        #elif e.key == SDLK_0:
+        #    for tile in gfw.world.objects_at(gfw.layer.tile):
+        #        gfw.world.remove(tile)
+        #    stage_gen.load(gobj.res('stages/stage_type3.txt'))
+        #    stage_gen.update()
 
     player.handle_event(e)
 

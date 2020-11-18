@@ -15,7 +15,7 @@ def load(file):
     with open(file, 'r') as f:
         lines = f.readlines()
     current_x = 0
-    map_index = random.randint(0,9)
+    map_index = 0 #random.randint(0,9)
     create_at = get_canvas_width() + 2 * BLOCK_SIZE
 
 def count():
@@ -46,6 +46,10 @@ def create_object(ch, x, y):
             gfw.world.add(gfw.layer.tile, obj)
             x += BLOCK_SIZE
         elif ch[i] == 'L':
+            obj = tile('ledder_top', x, y)
+            gfw.world.add(gfw.layer.tile, obj)
+            x += BLOCK_SIZE
+        elif ch[i] == 'l':
             obj = tile('ledder_bottom', x, y)
             gfw.world.add(gfw.layer.tile, obj)
             x += BLOCK_SIZE
