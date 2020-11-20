@@ -2,6 +2,7 @@ import gfw
 from player import Player
 from pico2d import *
 import gobj
+from background import InfiniteBackground
 import stage_gen
 import all_stage_gen
 
@@ -14,7 +15,7 @@ def enter():
     player = Player()
     gfw.world.add(gfw.layer.player, player)
 
-    bg = gobj.ImageObject('kpu_1280x960.png', (canvas_width // 2, canvas_height // 2))
+    bg = InfiniteBackground('kpu_1280x960.png')
     gfw.world.add(gfw.layer.bg, bg)
 
     all_stage_gen.make_all_map()

@@ -1,6 +1,5 @@
 import gfw
 from pico2d import *
-from tile import tile
 import gobj
 import random
 import stage_gen

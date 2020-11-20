@@ -62,7 +62,7 @@ class Player:
         self.rope_on = False
 
         self.speed = 200
-        self.image = gfw.image.load(gobj.RES_DIR + '/Player.png')
+        self.image = gfw.image.load(gobj.res('Player.png'))
         self.time = 0
         self.mag = 2
         self.FPS = 10
