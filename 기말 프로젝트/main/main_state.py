@@ -15,7 +15,7 @@ def enter():
     player = Player()
     gfw.world.add(gfw.layer.player, player)
 
-    bg = InfiniteBackground('kpu_1280x960.png')
+    bg = InfiniteBackground('kpu_1280x960.png', player.pos)
     gfw.world.add(gfw.layer.bg, bg)
 
     all_stage_gen.make_all_map()
@@ -38,8 +38,8 @@ def handle_event(e):
         elif e.key == SDLK_7:
             for tile in gfw.world.objects_at(gfw.layer.tile):
                 gfw.world.remove(tile)
-            stage_gen.load(gobj.res('stages/stage_type0.txt'))
-            stage_gen.update()
+            all_stage_gen.make_all_map()
+
     player.handle_event(e)
 
 def exit():

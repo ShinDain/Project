@@ -30,9 +30,10 @@ class Background:
         return x - l, y - b
 
 class InfiniteBackground(Background):
-    def __init__(self, imageName, width=0, height=0):
+    def __init__(self, imageName,center_object, width=0, height=0):
         super().__init__(imageName)
         self.boundary = (-sys.maxsize, -sys.maxsize, sys.maxsize, sys.maxsize)
+        self.center_object_pos = center_object
         self.fix_x, self.fix_y = self.cw // 2, self.ch // 2
         if width == 0:
             width = self.image.w
@@ -42,9 +43,10 @@ class InfiniteBackground(Background):
     def set_fixed_pos(self, x, y):
         self.fix_x, self.fix_y = x, y
     def update(self):
+        object_cx, object_cy = self.center_object_pos
         # quadrant 3
-        q3l = round(self.fix_x) % self.image.w
-        q3b = round(self.fix_y) % self.image.h
+        q3l = round(object_cx - self.fix_x) % self.image.w
+        q3b = round(object_cy - self.fix_y) % self.image.h
         q3w = clamp(0, self.image.w - q3l, self.image.w)
         q3h = clamp(0, self.image.h - q3b, self.image.h)
         self.q3rect = q3l, q3b, q3w, q3h
@@ -66,9 +68,9 @@ class InfiniteBackground(Background):
 
     def to_screen(self, point):
         x, y = point
-        return self.fix_x + x - tx, self.fix_y + y - ty
+        return self.fix_x + x, self.fix_y + y
 
     def translate(self, point):
         x, y = point
         dx, dy = x - self.fix_x, y - self.fix_y
-        return tx + dx, ty + dy
+        return dx, dy
