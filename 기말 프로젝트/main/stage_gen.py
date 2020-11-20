@@ -10,28 +10,26 @@ BLOCK_SIZE = 64
 
 lines = []
 
-def load(file):
-    global lines, current_x, map_index, create_at
+def load(file, x, y):
+    global lines, current_x, current_y, map_index
     with open(file, 'r') as f:
         lines = f.readlines()
-    current_x = 0
+    current_x = x * UNIT_PER_LINE * BLOCK_SIZE
+    current_y = y * (SCREEN_LINES - 1) * BLOCK_SIZE
     map_index = random.randint(0,9)
-    create_at = get_canvas_width() + 2 * BLOCK_SIZE
 
 def count():
     return len(lines) // SCREEN_LINES * UNIT_PER_LINE
 
 def update():
-    global current_x, create_at, map_index
     create_column()
 
 def create_column():
-    global current_x, map_index
-    y = 0;
+    global current_x,current_y, map_index
+    y = current_y;
     for row in range(SCREEN_LINES):
         ch = get(map_index, row)
         create_object(ch, current_x, y)
-        current_x = 0
         y += BLOCK_SIZE
     print('map_index:', map_index)
 
@@ -62,17 +60,6 @@ def get(x, y):
     row = x * SCREEN_LINES + SCREEN_LINES - y - 1
     print('lines[row] = ', lines[row])
     return lines[row]
-
-def test_gen():
-    load(gobj.res('stages/stage_type0.txt'))
-    print('count=', count())
-    line = 0
-    for x in range(10):
-        s = ''
-        for y in range(10):
-            s += get(x,y)
-        line += 1
-        print('%03d:' % line, s)
 
 def test_gen_2():
     open_canvas()
