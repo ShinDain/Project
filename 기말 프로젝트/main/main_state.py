@@ -4,13 +4,14 @@ from pico2d import *
 import gobj
 from background import HorzScrollBackground
 import all_stage_gen
+import camera
 
 canvas_width = 1000
 canvas_height = 800
 
 def enter():
     gfw.world.init(['bg','tile','player'])
-    global player
+    global player, bg
     player = Player()
     gfw.world.add(gfw.layer.player, player)
 
@@ -20,7 +21,17 @@ def enter():
     all_stage_gen.make_all_map()
 
 def update():
+    global player, bg
     gfw.world.update()
+    bg.speed = player.dx * 5
+
+    p_draw_x, p_draw_y, left_gab, bottom_gab = camera.update(player)
+
+    player.set_draw_pos(p_draw_x,p_draw_y)
+    for t in gfw.world.objects_at(gfw.layer.tile):
+        
+        t.left_gab = left_gab
+        t.bottom_gab = bottom_gab
     
 def draw():
     gfw.world.draw()

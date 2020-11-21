@@ -19,19 +19,18 @@ class tile:
         load()
         self.left = left
         self.bottom = bottom
+        self.left_gab = 0
+        self.bottom_gab = 0
         self.unit = 64
         self.name = name
         self.rect = tile_rects[name]
     def update(self): pass
     def draw(self):
-        tilesetimage.clip_draw_to_origin(*self.rect, self.left, self.bottom, self.unit, self.unit)
+        tilesetimage.clip_draw_to_origin(*self.rect, self.left - self.left_gab, self.bottom - self.bottom_gab, self.unit, self.unit)
     def get_bb(self):
-        return self.left, self.bottom, self.left + self.unit, self.bottom + self.unit
-    def move(self, dx):
+        return self.left - self.left_gab, self.bottom - self.bottom_gab, self.left + self.unit - self.left_gab, self.bottom + self.unit - self.bottom_gab
+    def move(self, dx, dy):
         self.left += dx
-        if self.left + self.unit < 0:
-            # print('count was:', gfw.world.count_at(gfw.layer.platform))
-            gfw.world.remove(self)
     @property
     def remove(self):
         gfw.world.remove(self)

@@ -52,6 +52,7 @@ class Player:
     #constructor
     def __init__(self):
         self.pos = 240,360
+        self.draw_pos = 240,360
         self.dx = 0
         self.crouch = 0
 
@@ -88,9 +89,9 @@ class Player:
         sy = sy * self.size + 64
 
         if self.look_left is False:
-            self.image.clip_draw(sx, sy, self.size, self.size, *self.pos, 80,80)
+            self.image.clip_draw(sx, sy, self.size, self.size, *self.draw_pos, 80,80)
         else:
-            self.image.clip_composite_draw(sx, sy, self.size, self.size, 0 , 'h', *self.pos , 80,80)
+            self.image.clip_composite_draw(sx, sy, self.size, self.size, 0 , 'h', *self.draw_pos, 80,80)
 
     def update(self):
         left,foot,right,_ = self.get_bb()                      # 바닥 체크
@@ -98,7 +99,6 @@ class Player:
         wall = self.get_wall(left,right)
         dx = self.get_ledder()
         self.get_floor()
-
 
         x,y = self.pos
         if self.state is not Player.ROPE_MOVE:
@@ -112,8 +112,10 @@ class Player:
         if tile is not None:
             dy = self.tile_check(tile,foot)
             y += dy
+        else: self.state = Player.FALLING
 
-        x += dx
+
+        x -= dx
         self.wall_check(wall,left,right)
 
         self.pos = x,y
@@ -133,46 +135,34 @@ class Player:
 
     def get_ledder(self):
         dx = 0
-        x,y = self.pos
-        _,P_bottom,_,_ = self.get_bb()
+        x,y = self.draw_pos
+        _,P_bottom,_,P_top = self.get_bb()
         for tile in gfw.world.objects_at(gfw.layer.tile):
             l,b,r,t = tile.get_bb()
-            if self.rope_on is True:     
+            if tile.name is not 'ledder_top' or tile.name is not 'ledder_bottom': continue
+            if x > r or x < l: continue
+            if P_top < b or P_bottom > t : self.rope_on = False
+            
+            if tile.name == 'ledder_bottom':
+                if y < b or y > t: continue
                 if self.crouch == 1:
+                    self.rope_on = True
                     self.jump_speed = 1
-                    if y > t and tile.name == 'ledder_top': 
-                        self.rope_on = False
                 elif self.crouch == -1:
+                    self.rope_on = True
                     self.jump_speed = -1
-                else:
-                    self.time = 0
-                    self.jump_speed = 0
-            else:
-                if tile.name == 'ledder_bottom':
-                    if x < l or x > r: continue
-                    if y < b or y > t: continue
-                    if self.crouch == 1:
-                        self.rope_on = True
-                        self.jump_speed = 1
-                        dx = l + tile.unit // 2 - x
-                    elif self.crouch == -1:
+            elif tile.name == 'ledder_top':
+                if y > b and y < t + tile.unit:
+                    if self.crouch == -1:
                         self.rope_on = True
                         self.jump_speed = -1
-                        dx = l + tile.unit // 2 - x
-                elif tile.name == 'ledder_top':
-                    if x < l or x > r: continue
-                    if y > b and y < t + tile.unit:
-                        if self.crouch == -1:
-                            self.rope_on = True
-                            self.jump_speed = -1
-                            dx = l + tile.unit // 2 - x
-                    if y < b or y > t: continue
-                    if self.crouch == 1:
-                        self.rope_on = True
-                        self.jump_speed = 1
-                        dx = l + tile.unit // 2 - x
+                if y < b or y > t: continue
+                if self.crouch == 1:
+                    self.rope_on = True
+                    self.jump_speed = 1
+                
+            dx = x - (l + tile.unit // 2)
         return dx
-
 
     def get_floor(self):
         if self.jump_on == True and self.jump_time < 0.3:
@@ -182,7 +172,7 @@ class Player:
             self.jump_time = 0
             self.jump_on = False
 
-        x, y = self.pos
+        x, y = self.draw_pos
         _,_,_,P_top = self.get_bb()
         for tile in gfw.world.objects_at(gfw.layer.tile):
             if tile.name == 'ledder_bottom' or tile.name == 'ledder_top': continue
@@ -198,11 +188,10 @@ class Player:
                     self.jump_on = False
                     self.jump_time = 0
 
-
     def get_tile(self, foot):
         selected = None
         sel_top = 0
-        x,y = self.pos
+        x,y = self.draw_pos
         for tile in gfw.world.objects_at(gfw.layer.tile):
             if tile.name == 'ledder_bottom': continue
             if tile.name == 'ledder_top' and self.rope_on is True: continue
@@ -241,7 +230,7 @@ class Player:
 
     def get_wall(self, left, right):
         selected = None
-        _,y = self.pos
+        _,y = self.draw_pos
         for tile in gfw.world.objects_at(gfw.layer.tile):
             if tile.name == 'ledder_bottom' or tile.name == 'ledder_top': continue
             l,b,r,t = tile.get_bb()
@@ -323,8 +312,11 @@ class Player:
         else:
             self.speed = 200
 
+    def set_draw_pos(self, x, y):
+        self.draw_pos = x, y
+
     def get_bb(self):
         hw = 24
         hh = 28
-        x,y = self.pos
+        x,y = self.draw_pos
         return x - hw, y - hh, x + hw, y + hh
