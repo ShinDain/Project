@@ -36,8 +36,8 @@ def handle_event(e):
         if e.key == SDLK_ESCAPE:
             gfw.pop()
         elif e.key == SDLK_7:
-            for tile in gfw.world.objects_at(gfw.layer.tile):
-                gfw.world.remove(tile)
+            for t in gfw.world.objects_at(gfw.layer.tile):
+                gfw.world.remove(t)
             all_stage_gen.make_all_map()
 
     player.handle_event(e)

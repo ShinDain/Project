@@ -17,5 +17,6 @@ def make_all_map():
         stage_gen.update()
         map_x += 1
         map_x = map_x % 4
-        map_y = load_count // 4
         load_count += 1
+        map_y = load_count // 4
+        

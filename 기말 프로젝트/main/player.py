@@ -140,7 +140,7 @@ class Player:
             if self.rope_on is True:     
                 if self.crouch == 1:
                     self.jump_speed = 1
-                    if y > t: 
+                    if y > t and tile.name == 'ledder_top': 
                         self.rope_on = False
                 elif self.crouch == -1:
                     self.jump_speed = -1
@@ -154,6 +154,10 @@ class Player:
                     if self.crouch == 1:
                         self.rope_on = True
                         self.jump_speed = 1
+                        dx = l + tile.unit // 2 - x
+                    elif self.crouch == -1:
+                        self.rope_on = True
+                        self.jump_speed = -1
                         dx = l + tile.unit // 2 - x
                 elif tile.name == 'ledder_top':
                     if x < l or x > r: continue
