@@ -2,8 +2,7 @@ import gfw
 from player import Player
 from pico2d import *
 import gobj
-from background import InfiniteBackground
-import stage_gen
+from background import HorzScrollBackground
 import all_stage_gen
 
 canvas_width = 1000
@@ -15,7 +14,7 @@ def enter():
     player = Player()
     gfw.world.add(gfw.layer.player, player)
 
-    bg = InfiniteBackground('kpu_1280x960.png', player.pos)
+    bg = HorzScrollBackground('Background.png')
     gfw.world.add(gfw.layer.bg, bg)
 
     all_stage_gen.make_all_map()
