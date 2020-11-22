@@ -50,7 +50,6 @@ def update(player):
 			bottom_gab += p_c * 200 * (camera_time - 1)
 	else:
 		camera_time = 0
-
 	
 	return p_draw_x, p_draw_y, left_gab, bottom_gab
 

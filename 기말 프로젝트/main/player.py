@@ -63,7 +63,6 @@ class Player:
         self.jump_on = False
         self.jump_time = 0
         
-
         self.rope_on = False
 
         self.speed = 200
