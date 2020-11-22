@@ -5,5 +5,7 @@
 "arrow_block" : [64,1984,64,64],
 "ledder_top" : [192,1984,64,64],
 "ledder_bottom" : [128,1984,64,64],
-"boom_block" : [448,1600,64,64]
+"boom_block" : [448,1600,64,64],
+"entrance" : [],
+"exit" : []
 }

@@ -56,6 +56,8 @@ def select_room_shape():
                 room_shape[(x,y)] = random.choice([1,3])
 
 def load_stage_data():
+    global entrance, exit
+
     load_count = 0
     map_x = 0
     map_y = 0
@@ -70,6 +72,16 @@ def load_stage_data():
             fn = file_fmt % random.randint(0,3)
             stage_gen.load(gobj.res(fn), map_x, map_y)
             stage_gen.update()
+
+        if (map_x, map_y) == entrance:
+            fn = 'stages/entrance.txt'
+            stage_gen.load_door(gobj.res(fn), map_x, map_y)
+            stage_gen.update()
+        elif (map_x, map_y) == exit:
+            fn = 'stages/exit.txt'
+            stage_gen.load_door(gobj.res(fn), map_x, map_y)
+            stage_gen.update()
+
         map_x += 1
         map_x = map_x % 4
         load_count += 1

@@ -183,6 +183,7 @@ class Player:
         x, y = self.draw_pos
         _,_,_,P_top = self.get_bb()
         for tile in gfw.world.objects_at(gfw.layer.tile):
+            if tile.name in ['entrance', 'exit']: continue
             if tile.name == 'ledder_bottom' or tile.name == 'ledder_top': continue
             l,b,r,t = tile.get_bb()
             if x > r + 10 or x < l - 10: continue
@@ -202,6 +203,7 @@ class Player:
         x,y = self.draw_pos
         for tile in gfw.world.objects_at(gfw.layer.tile):
             if tile.name == 'ledder_bottom': continue
+            if tile.name in ['entrance', 'exit']: continue
             if tile.name == 'ledder_top' and self.rope_on is True: continue
             l,b,r,t = tile.get_bb()
             if x < l - 10 or x > r + 10: continue
@@ -240,6 +242,7 @@ class Player:
         selected = None
         _,y = self.draw_pos
         for tile in gfw.world.objects_at(gfw.layer.tile):
+            if tile.name in ['entrance', 'exit']: continue
             if tile.name == 'ledder_bottom' or tile.name == 'ledder_top': continue
             l,b,r,t = tile.get_bb()
             if y > t or y < b: continue

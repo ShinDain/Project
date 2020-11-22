@@ -18,6 +18,14 @@ def load(file, x, y):
     current_y = y * (SCREEN_LINES - 1) * BLOCK_SIZE
     map_index = random.randint(0,9)
 
+def load_door(file,x,y):
+    global lines, current_x, current_y, map_index
+    with open(file, 'r') as f:
+        lines = f.readlines()
+    current_x = x * UNIT_PER_LINE * BLOCK_SIZE
+    current_y = y * (SCREEN_LINES - 1) * BLOCK_SIZE
+    map_index = 0
+
 def count():
     return len(lines) // SCREEN_LINES * UNIT_PER_LINE
 
@@ -49,6 +57,14 @@ def create_object(ch, x, y):
             x += BLOCK_SIZE
         elif ch[i] == 'l':
             obj = tile('ledder_bottom', x, y)
+            gfw.world.add(gfw.layer.tile, obj)
+            x += BLOCK_SIZE
+        elif ch[i] == '9':
+            obj = tile('entrance', x, y)
+            gfw.world.add(gfw.layer.tile, obj)
+            x += BLOCK_SIZE
+        elif ch[i] == '8':
+            obj = tile('exit', x, y)
             gfw.world.add(gfw.layer.tile, obj)
             x += BLOCK_SIZE
         else:
