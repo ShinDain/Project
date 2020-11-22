@@ -44,15 +44,14 @@ def update(player):
 
 	if player.state in [Player.LOOKUP, Player.CROUCH] and player.fidx is len(player.anim) - 1:
 		camera_time += gfw.delta_time
+		camera_time = clamp(0,camera_time,3)
 		if camera_time > 1:
-			print('작동')
 			p_draw_y += p_c * -200 * (camera_time - 1)
 			bottom_gab += p_c * 200 * (camera_time - 1)
 	else:
 		camera_time = 0
 
-	camera_time = clamp(0,camera_time,3)
-
+	
 	return p_draw_x, p_draw_y, left_gab, bottom_gab
 
 
