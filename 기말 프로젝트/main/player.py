@@ -4,6 +4,9 @@ import gfw
 import gobj
 import tile
 
+FULL_MAP_WIDTH = 2560
+FULL_MAP_HEIGHT = 2048
+
 class Player:
     KEY_MAP = {
         (SDL_KEYDOWN, SDLK_LEFT):  (-1,  0),
@@ -47,12 +50,12 @@ class Player:
     STUN_DEATH, GRAB_WALL, ATTACK, THROW, LOOKUP, JUMP, \
     FALLING, PUSHING, ROPE_MOVE, OUT_STAGE, IN_STAGE = range(17)
 
-    Gravity = 8
+    Gravity = 9
 
     #constructor
     def __init__(self):
-        self.pos = 240,360
-        self.draw_pos = 240,360
+        self.pos = 2000,2000
+        self.draw_pos = self.pos
         self.dx = 0
         self.crouch = 0
 
@@ -97,11 +100,13 @@ class Player:
         left,foot,right,_ = self.get_bb()                      # 바닥 체크
         tile = self.get_tile(foot)
         wall = self.get_wall(left,right)
-        dx = self.get_ledder()
+        dx, ledder = self.get_ledder()
         self.get_floor()
 
         x,y = self.pos
-        if self.state is not Player.ROPE_MOVE:
+        if self.state in [Player.ROPE_MOVE,Player.LOOKUP]:
+            pass
+        else:
             x += self.dx * self.speed * self.mag * gfw.delta_time
         y += self.jump_speed * self.speed * gfw.delta_time
         
@@ -113,10 +118,14 @@ class Player:
             dy = self.tile_check(tile,foot)
             y += dy
         else: self.state = Player.FALLING
-
+        if ledder is None:
+            self.rope_on = False
 
         x -= dx
         self.wall_check(wall,left,right)
+
+        x = clamp(20, x,FULL_MAP_WIDTH - 20)
+        y = clamp(0, y,FULL_MAP_HEIGHT)
 
         self.pos = x,y
         self.time += gfw.delta_time
@@ -135,34 +144,33 @@ class Player:
 
     def get_ledder(self):
         dx = 0
+        ledder = None
         x,y = self.draw_pos
         _,P_bottom,_,P_top = self.get_bb()
         for tile in gfw.world.objects_at(gfw.layer.tile):
+            if tile.name is not 'ledder_top' and tile.name is not 'ledder_bottom': continue
             l,b,r,t = tile.get_bb()
-            if tile.name is not 'ledder_top' or tile.name is not 'ledder_bottom': continue
             if x > r or x < l: continue
-            if P_top < b or P_bottom > t : self.rope_on = False
-            
-            if tile.name == 'ledder_bottom':
-                if y < b or y > t: continue
-                if self.crouch == 1:
-                    self.rope_on = True
-                    self.jump_speed = 1
-                elif self.crouch == -1:
-                    self.rope_on = True
-                    self.jump_speed = -1
-            elif tile.name == 'ledder_top':
-                if y > b and y < t + tile.unit:
-                    if self.crouch == -1:
-                        self.rope_on = True
-                        self.jump_speed = -1
-                if y < b or y > t: continue
-                if self.crouch == 1:
-                    self.rope_on = True
-                    self.jump_speed = 1
-                
-            dx = x - (l + tile.unit // 2)
-        return dx
+            if tile.name is 'ledder_top' and P_bottom - 5 < t and self.crouch == -1 : 
+                self.rope_on = True
+                self.jump_speed = -1
+                ledder = tile
+            if y < b or y > t: continue
+            if self.crouch == 1:
+                self.rope_on = True
+                self.jump_speed = 1
+            elif self.crouch == -1:
+                self.rope_on = True
+                self.jump_speed = -1
+            elif self.crouch == 0 and self.rope_on is True:
+                self.jump_speed = 0
+                self.time = 0
+            if self.rope_on is True:
+                dx = x - (l + tile.unit // 2)
+            if ledder is None:
+                ledder = tile
+
+        return dx, ledder
 
     def get_floor(self):
         if self.jump_on == True and self.jump_time < 0.3:
@@ -177,7 +185,7 @@ class Player:
         for tile in gfw.world.objects_at(gfw.layer.tile):
             if tile.name == 'ledder_bottom' or tile.name == 'ledder_top': continue
             l,b,r,t = tile.get_bb()
-            if x > r or x < l: continue
+            if x > r + 10 or x < l - 10: continue
             gab = (b + t) // 2
             if y > gab: continue
             if P_top < b:
@@ -196,7 +204,7 @@ class Player:
             if tile.name == 'ledder_bottom': continue
             if tile.name == 'ledder_top' and self.rope_on is True: continue
             l,b,r,t = tile.get_bb()
-            if x < l - 8 or x > r + 8: continue
+            if x < l - 10 or x > r + 10: continue
             gab = (b + t) // 2 + 5
             if foot < gab: continue
             if selected is None:

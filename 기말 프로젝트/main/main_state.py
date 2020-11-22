@@ -20,6 +20,8 @@ def enter():
 
     all_stage_gen.make_all_map()
 
+    camera.camera_init()
+
 def update():
     global player, bg
     gfw.world.update()
@@ -29,7 +31,6 @@ def update():
 
     player.set_draw_pos(p_draw_x,p_draw_y)
     for t in gfw.world.objects_at(gfw.layer.tile):
-        
         t.left_gab = left_gab
         t.bottom_gab = bottom_gab
     

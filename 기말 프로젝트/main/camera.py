@@ -6,8 +6,15 @@ import gobj
 FULL_MAP_WIDTH = 2560
 FULL_MAP_HEIGHT = 2048
 
+def camera_init():
+	global camera_time
+	camera_time = 0
+
 def update(player):
+	global camera_time
+
 	p_x, p_y = player.pos
+	p_c = player.crouch
 	cw = get_canvas_width()
 	ch = get_canvas_height()
 
@@ -34,7 +41,18 @@ def update(player):
 	else: 
 		bottom_gab = p_y - (ch // 2)
 		p_draw_y = ch // 2
-		
+
+	if player.state in [Player.LOOKUP, Player.CROUCH] and player.fidx is len(player.anim) - 1:
+		camera_time += gfw.delta_time
+		if camera_time > 1:
+			print('작동')
+			p_draw_y += p_c * -200 * (camera_time - 1)
+			bottom_gab += p_c * 200 * (camera_time - 1)
+	else:
+		camera_time = 0
+
+	camera_time = clamp(0,camera_time,3)
+
 	return p_draw_x, p_draw_y, left_gab, bottom_gab
 
 
