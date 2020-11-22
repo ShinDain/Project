@@ -17,8 +17,16 @@ def enter():
 
     bg = HorzScrollBackground('Background.png')
     gfw.world.add(gfw.layer.bg, bg)
+    
+    x,y = all_stage_gen.make_all_map()
 
-    all_stage_gen.make_all_map()
+    x = x * 640 + 320
+    y = y * 512 + 192
+    player.pos = x + 32, y + 32
+
+    for t in gfw.world.objects_at(gfw.layer.tile):
+        if t.left == x and t.bottom == y and t.name is not 'entrance':
+            gfw.world.remove(t)
 
     camera.camera_init()
 
@@ -36,10 +44,12 @@ def update():
     
 def draw():
     gfw.world.draw()
-    gobj.draw_collision_box()
+    #gobj.draw_collision_box()
     
 def handle_event(e):
     global player
+
+    x, y = 0,0
     # prev_dx = boy.dx0 
     if e.type == SDL_QUIT:
         gfw.quit()
@@ -49,7 +59,15 @@ def handle_event(e):
         elif e.key == SDLK_7:
             for t in gfw.world.objects_at(gfw.layer.tile):
                 gfw.world.remove(t)
-            all_stage_gen.make_all_map()
+            x, y = all_stage_gen.make_all_map()
+
+            x = x * 640 + 320
+            y = y * 512 + 192
+            player.pos = x + 32, y + 32
+
+            for t in gfw.world.objects_at(gfw.layer.tile):
+                if t.left == x and t.bottom == y and t.name is not 'entrance':
+                    gfw.world.remove(t)
 
     player.handle_event(e)
 

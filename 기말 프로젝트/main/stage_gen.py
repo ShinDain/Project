@@ -59,6 +59,10 @@ def create_object(ch, x, y):
             obj = tile('ledder_bottom', x, y)
             gfw.world.add(gfw.layer.tile, obj)
             x += BLOCK_SIZE
+        elif ch[i] == 'S':
+            obj = tile('spike', x, y)
+            gfw.world.add(gfw.layer.tile, obj)
+            x += BLOCK_SIZE
         elif ch[i] == '9':
             obj = tile('entrance', x, y)
             gfw.world.add(gfw.layer.tile, obj)

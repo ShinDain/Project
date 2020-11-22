@@ -18,8 +18,10 @@ class Player:
         (SDL_KEYUP, SDLK_DOWN):    ( 0,  1),
         (SDL_KEYUP, SDLK_UP):      ( 0, -1),
     }
-    KETDOWN_Z = (SDL_KEYDOWN, SDLK_z)
-    KETDOWN_X = (SDL_KEYDOWN, SDLK_x)
+    KEYDOWN_Z = (SDL_KEYDOWN, SDLK_z)
+    KEYUP_Z = (SDL_KEYUP, SDLK_z)
+    KEYDOWN_X = (SDL_KEYDOWN, SDLK_x)
+    
     KEYDOWN_SPACE  = (SDL_KEYDOWN, SDLK_SPACE)
     KEYUP_SPACE  = (SDL_KEYUP, SDLK_SPACE)
     KEYDOWN_LSHIFT = (SDL_KEYDOWN, SDLK_LSHIFT)
@@ -271,10 +273,10 @@ class Player:
             self.dx += Player.KEY_MAP[pair][0]
             self.crouch += Player.KEY_MAP[pair][1]
         # print(dx, pdx, self.action)
-        elif pair == Player.KEYDOWN_SPACE:
+        elif pair == Player.KEYDOWN_Z:
             self.rope_on = False 
             self.jump()
-        elif pair == Player.KEYUP_SPACE:
+        elif pair == Player.KEYUP_Z:
             self.jump_on = False
 
     def move(self):

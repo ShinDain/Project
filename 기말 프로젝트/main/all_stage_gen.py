@@ -8,10 +8,13 @@ map_pos = []
 room_shape = {}
 
 def make_all_map():
+    global entrance
     make_map_shape()
     select_room_shape()
     load_stage_data()
-        
+    
+    return entrance
+
 def make_map_shape():
     global entrance, exit
     map_x = random.randint(0,3)

@@ -3,8 +3,10 @@ import gfw
 import gobj
 
 tilesetimage = None
+
 entranceimage = None
 exitimage = None
+
 tile_rects = {}
 
 def load():
@@ -33,9 +35,9 @@ class tile:
     def update(self): pass
     def draw(self):
         if self.name is 'entrance':
-            entranceimage.draw_to_origin(self.left - self.left_gab, self.bottom - self.bottom_gab, self.unit, self.unit)
+            entranceimage.clip_draw_to_origin(*self.rect,self.left - self.left_gab, self.bottom - self.bottom_gab, self.unit, self.unit)
         elif self.name is 'exit':
-            exitimage.draw_to_origin(self.left - self.left_gab, self.bottom - self.bottom_gab, self.unit, self.unit)
+            exitimage.clip_draw_to_origin(*self.rect, self.left - self.left_gab, self.bottom - self.bottom_gab, self.unit, self.unit)
         else:
             tilesetimage.clip_draw_to_origin(*self.rect, self.left - self.left_gab, self.bottom - self.bottom_gab, self.unit, self.unit)
     def get_bb(self):
