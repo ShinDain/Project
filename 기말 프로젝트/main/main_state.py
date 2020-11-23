@@ -12,8 +12,7 @@ canvas_height = 800
 def enter():
     gfw.world.init(['bg','tile','player'])
     global player, bg
-    player = Player()
-    gfw.world.add(gfw.layer.player, player)
+    
 
     bg = HorzScrollBackground('Background.png')
     gfw.world.add(gfw.layer.bg, bg)
@@ -22,7 +21,8 @@ def enter():
 
     x = x * 640 + 320
     y = y * 512 + 192
-    player.pos = x + 32, y + 32
+    player = Player(x + 32,y + 32)
+    gfw.world.add(gfw.layer.player, player)
 
     for t in gfw.world.objects_at(gfw.layer.tile):
         if t.left == x and t.bottom == y and t.name is not 'entrance':
@@ -42,13 +42,23 @@ def update():
         t.left_gab = left_gab
         t.bottom_gab = bottom_gab
     
+def reset():
+    gfw.world.clear_at(gfw.layer.tile)
+    x, y = all_stage_gen.make_all_map()
+
+    x = x * 640 + 320
+    y = y * 512 + 192
+    player.reset(x + 32,y + 32)
+
+    for t in gfw.world.objects_at(gfw.layer.tile):
+        if t.left == x and t.bottom == y and t.name is not 'entrance':
+            gfw.world.remove(t)
+
 def draw():
     gfw.world.draw()
     #gobj.draw_collision_box()
     
 def handle_event(e):
-    global player
-
     x, y = 0,0
     # prev_dx = boy.dx0 
     if e.type == SDL_QUIT:
@@ -57,17 +67,7 @@ def handle_event(e):
         if e.key == SDLK_ESCAPE:
             gfw.pop()
         elif e.key == SDLK_7:
-            for t in gfw.world.objects_at(gfw.layer.tile):
-                gfw.world.remove(t)
-            x, y = all_stage_gen.make_all_map()
-
-            x = x * 640 + 320
-            y = y * 512 + 192
-            player.pos = x + 32, y + 32
-
-            for t in gfw.world.objects_at(gfw.layer.tile):
-                if t.left == x and t.bottom == y and t.name is not 'entrance':
-                    gfw.world.remove(t)
+            reset()
 
     player.handle_event(e)
 

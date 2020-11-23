@@ -55,21 +55,24 @@ class Player:
     Gravity = 9
 
     #constructor
-    def __init__(self):
-        self.pos = 2000,2000
+    def __init__(self,x,y):
+        self.speed = 200
+        self.image = gfw.image.load(gobj.res('Player.png'))        
+        self.reset(x,y)
+        
+    def reset(self,x,y):
+        self.pos = x,y
         self.draw_pos = self.pos
         self.dx = 0
         self.crouch = 0
 
-        self.jump_speed = 0
         self.jump_on = False
         self.jump_time = 0
-        
-        self.rope_on = False
+        self.jump_speed = 0
 
-        self.speed = 200
-        self.image = gfw.image.load(gobj.res('Player.png'))
+        self.rope_on = False
         self.time = 0
+
         self.mag = 2
         self.FPS = 10
         
@@ -78,7 +81,13 @@ class Player:
 
         self.state = Player.IDLE
         self.fidx = 0
-        
+
+        self.dameged = False
+        self.dameged_time = 0
+        self.stun = False
+
+        self.life = 4
+
     @property
     def state(self):
         return self.__state
@@ -102,24 +111,32 @@ class Player:
         left,foot,right,_ = self.get_bb()                      # 바닥 체크
         tile = self.get_tile(foot)
         wall = self.get_wall(left,right)
-        dx, ledder = self.get_ledder()
+
+        dx = 0
+        ledder = None
+        if self.state in [Player.DAMAGED]:
+            pass
+        else:    
+            dx, ledder = self.get_ledder()
+
         self.get_floor()
 
         x,y = self.pos
-        if self.state in [Player.ROPE_MOVE,Player.LOOKUP]:
+        if self.state in [Player.ROPE_MOVE,Player.LOOKUP, Player.DAMAGED]:
             pass
         else:
             x += self.dx * self.speed * self.mag * gfw.delta_time
         y += self.jump_speed * self.speed * gfw.delta_time
         
-        if self.state in [Player.FALLING, Player.JUMP]:
+        if self.state in [Player.FALLING, Player.JUMP,Player.DAMAGED, Player.STUN_DEATH]:
             self.jump_speed -= Player.Gravity * gfw.delta_time   # 중력 적용
 
         dy = 0
         if tile is not None:
             dy = self.tile_check(tile,foot)
             y += dy
-        else: self.state = Player.FALLING
+        else: 
+            self.state = Player.FALLING
         if ledder is None:
             self.rope_on = False
 
@@ -131,11 +148,15 @@ class Player:
 
         self.pos = x,y
         self.time += gfw.delta_time
+        self.dameged_time -= gfw.delta_time
 
         self.state_check()
 
         if self.state in [Player.LOOKUP,Player.CROUCH, Player.FALLING, Player.JUMP] and self.fidx == len(self.anim) - 1:
             self.fidx = len(self.anim) - 1
+        elif self.state in [Player.DAMAGED] and self.fidx == len(self.anim) - 1:
+            self.stun = True
+            self.time = 0
         else:
             frame = self.time * self.FPS
             self.fidx = int(frame) % len(self.anim)
@@ -143,6 +164,124 @@ class Player:
         self.change_FPS()
         self.change_speed()
         # self.player.pos = point_add(self.player.pos, self.player.delta)
+
+    def dameged_just(self):
+        if self.dameged_time > 0:
+            return
+        self.life = max(0,self.life -1)
+        self.jump_speed += 0.5
+        self.rope_on = False
+        self.dameged_time = 1
+        if self.life is 0:
+            self.state = Player.STUN_DEATH
+
+    def dameged_to_stun(self):
+        if self.dameged_time > 0:
+            return
+        self.life = max(0,self.life -1)
+        self.state = Player.DAMAGED
+        self.time = 0
+        self.jump_speed += 0.5
+        self.rope_on = False
+        self.dameged = True
+        self.dameged_time = 1
+        if self.life is 0:
+            self.state = Player.STUN_DEATH
+
+    def recover(self):
+        if self.time > 1:
+            self.dameged = False
+            self.stun = False
+            self.state = Player.IDLE
+
+    def handle_event(self, e):
+        if self.state in [Player.STUN_DEATH]: return
+        pair = (e.type, e.key)
+        if pair in Player.KEY_MAP:
+            if self.state in [Player.DAMAGED, Player.STUN_DEATH]: pass
+            else:
+                self.time = 0
+            if self.state is Player.CROUCH_MOVE:
+                self.fidx = 2
+            self.dx += Player.KEY_MAP[pair][0]
+            self.crouch += Player.KEY_MAP[pair][1]
+        # print(dx, pdx, self.action)
+        if e.type == SDL_KEYDOWN:
+            if e.key == SDLK_l:
+                self.dameged_just()
+            elif e.key == SDLK_k:
+                self.dameged_to_stun()
+        if pair == Player.KEYDOWN_Z:
+            self.rope_on = False 
+            self.jump()
+        elif pair == Player.KEYUP_Z:
+            self.jump_on = False
+        
+    def move(self):
+        if self.state in [Player.CROUCH, Player.CROUCH_MOVE]:
+            self.state = Player.CROUCH_MOVE
+        elif self.state in [Player.IDLE]:
+            self.state = Player.MOVE
+        else:
+            return
+
+    def jump(self):
+        if self.state in [Player.JUMP, Player.FALLING]: return
+        else:
+            self.state = Player.JUMP
+            self.jump_on = True
+
+    def state_check(self):
+        if self.life == 0:
+            self.state = Player.STUN_DEATH
+            return
+        if self.dameged == True:
+            if self.stun == True:
+                self.state = Player.STUN_DEATH
+            else:
+                self.state = Player.DAMAGED
+            self.recover()
+            return
+
+        if self.dx is 0 and self.jump_speed is 0:
+            if self.crouch is 1:
+                self.state = Player.LOOKUP
+            elif self.crouch is -1:
+                self.state = Player.CROUCH
+            else:
+                self.state = Player.IDLE
+        if self.dx is -1:
+                self.look_left = True
+                self.move()
+        elif self.dx is 1:
+                self.look_left = False
+                self.move()
+        if self.rope_on is True:
+            self.state = Player.ROPE_MOVE
+
+
+    def change_FPS(self):
+        if self.state in [Player.MOVE]:
+            self.FPS = 20
+        elif self.state in [Player.LOOKUP, Player.CROUCH]:
+            self.FPS = 10
+        else:
+            self.FPS = 10
+
+    def change_speed(self):
+        if self.state in [Player.CROUCH_MOVE, Player.CROUCH]:
+            self.speed = 50
+        else:
+            self.speed = 200
+
+    def set_draw_pos(self, x, y):
+        self.draw_pos = x, y
+
+    def get_bb(self):
+        hw = 24
+        hh = 28
+        x,y = self.draw_pos
+        return x - hw, y - hh, x + hw, y + hh
 
     def get_ledder(self):
         dx = 0
@@ -226,6 +365,7 @@ class Player:
         l,b,r,t = tile.get_bb()
         dy = 0
         if foot > t:
+            if self.state in [Player.DAMAGED, Player.STUN_DEATH]: return dy
             if self.jump_speed > 0:
                 self.state = Player.JUMP
             else:
@@ -234,7 +374,8 @@ class Player:
             # print('falling', t, foot)
             if self.jump_speed <= 0 and int(foot) < t:
                 dy = t - foot
-                self.state = Player.MOVE
+                if self.state is Player.DAMAGED: self.state = Player.STUN_DEATH
+                else: self.state = Player.MOVE
                 self.jump_speed = 0
                 self.rope_on = False
                 # print('Now running', t, foot)
@@ -263,73 +404,3 @@ class Player:
                 self.mag = 2
         else:
             self.mag = 2
-
-    def handle_event(self, e):
-        pair = (e.type, e.key)
-        if pair in Player.KEY_MAP:
-            self.time = 0
-            if self.state is Player.CROUCH_MOVE:
-                self.fidx = 2
-            self.dx += Player.KEY_MAP[pair][0]
-            self.crouch += Player.KEY_MAP[pair][1]
-        # print(dx, pdx, self.action)
-        elif pair == Player.KEYDOWN_Z:
-            self.rope_on = False 
-            self.jump()
-        elif pair == Player.KEYUP_Z:
-            self.jump_on = False
-
-    def move(self):
-        if self.state in [Player.CROUCH, Player.CROUCH_MOVE]:
-            self.state = Player.CROUCH_MOVE
-        elif self.state in [Player.IDLE]:
-            self.state = Player.MOVE
-        else:
-            return
-
-    def jump(self):
-        if self.state in [Player.JUMP, Player.FALLING]: return
-        else:
-            self.state = Player.JUMP
-            self.jump_on = True
-
-    def state_check(self):
-        if self.dx is 0 and self.jump_speed is 0:
-            if self.crouch is 1:
-                self.state = Player.LOOKUP
-            elif self.crouch is -1:
-                self.state = Player.CROUCH
-            else:
-                self.state = Player.IDLE
-        if self.dx is -1:
-                self.look_left = True
-                self.move()
-        elif self.dx is 1:
-                self.look_left = False
-                self.move()
-        if self.rope_on is True:
-            self.state = Player.ROPE_MOVE
-
-
-    def change_FPS(self):
-        if self.state in [Player.MOVE]:
-            self.FPS = 20
-        elif self.state in [Player.LOOKUP, Player.CROUCH]:
-            self.FPS = 10
-        else:
-            self.FPS = 10
-
-    def change_speed(self):
-        if self.state in [Player.CROUCH_MOVE, Player.CROUCH]:
-            self.speed = 50
-        else:
-            self.speed = 200
-
-    def set_draw_pos(self, x, y):
-        self.draw_pos = x, y
-
-    def get_bb(self):
-        hw = 24
-        hh = 28
-        x,y = self.draw_pos
-        return x - hw, y - hh, x + hw, y + hh
