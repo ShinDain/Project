@@ -44,10 +44,10 @@ def update(player):
 
 	if player.state in [Player.LOOKUP, Player.CROUCH] and player.fidx is len(player.anim) - 1:
 		camera_time += gfw.delta_time
-		camera_time = clamp(0,camera_time,3)
+		camera_time = clamp(0,camera_time,2)
 		if camera_time > 1:
-			p_draw_y += p_c * -200 * (camera_time - 1)
-			bottom_gab += p_c * 200 * (camera_time - 1)
+			p_draw_y += p_c * -500 * (camera_time - 1)
+			bottom_gab += p_c * 500 * (camera_time - 1)
 	else:
 		camera_time = 0
 	
