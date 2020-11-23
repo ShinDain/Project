@@ -86,6 +86,10 @@ class Player:
         self.dameged_time = 0
         self.stun = False
 
+        self.grap_item = None
+
+        self.attack = False
+
         self.life = 4
 
     @property
@@ -128,15 +132,13 @@ class Player:
             x += self.dx * self.speed * self.mag * gfw.delta_time
         y += self.jump_speed * self.speed * gfw.delta_time
         
-        if self.state in [Player.FALLING, Player.JUMP,Player.DAMAGED, Player.STUN_DEATH]:
-            self.jump_speed -= Player.Gravity * gfw.delta_time   # 중력 적용
-
         dy = 0
         if tile is not None:
             dy = self.tile_check(tile,foot)
             y += dy
         else: 
             self.state = Player.FALLING
+            self.jump_speed -= Player.Gravity * gfw.delta_time   # 중력 적용
         if ledder is None:
             self.rope_on = False
 
@@ -157,6 +159,8 @@ class Player:
         elif self.state in [Player.DAMAGED] and self.fidx == len(self.anim) - 1:
             self.stun = True
             self.time = 0
+        elif self.state in [Player.ATTACK] and self.fidx == len(self.anim) - 1:
+            self.attack = False
         else:
             frame = self.time * self.FPS
             self.fidx = int(frame) % len(self.anim)
@@ -165,40 +169,11 @@ class Player:
         self.change_speed()
         # self.player.pos = point_add(self.player.pos, self.player.delta)
 
-    def dameged_just(self):
-        if self.dameged_time > 0:
-            return
-        self.life = max(0,self.life -1)
-        self.jump_speed += 0.5
-        self.rope_on = False
-        self.dameged_time = 1
-        if self.life is 0:
-            self.state = Player.STUN_DEATH
-
-    def dameged_to_stun(self):
-        if self.dameged_time > 0:
-            return
-        self.life = max(0,self.life -1)
-        self.state = Player.DAMAGED
-        self.time = 0
-        self.jump_speed += 0.5
-        self.rope_on = False
-        self.dameged = True
-        self.dameged_time = 1
-        if self.life is 0:
-            self.state = Player.STUN_DEATH
-
-    def recover(self):
-        if self.time > 1:
-            self.dameged = False
-            self.stun = False
-            self.state = Player.IDLE
-
     def handle_event(self, e):
         if self.state in [Player.STUN_DEATH]: return
         pair = (e.type, e.key)
         if pair in Player.KEY_MAP:
-            if self.state in [Player.DAMAGED, Player.STUN_DEATH]: pass
+            if self.state in [Player.DAMAGED, Player.STUN_DEATH, Player.ATTACK]: pass
             else:
                 self.time = 0
             if self.state is Player.CROUCH_MOVE:
@@ -216,20 +191,8 @@ class Player:
             self.jump()
         elif pair == Player.KEYUP_Z:
             self.jump_on = False
-        
-    def move(self):
-        if self.state in [Player.CROUCH, Player.CROUCH_MOVE]:
-            self.state = Player.CROUCH_MOVE
-        elif self.state in [Player.IDLE]:
-            self.state = Player.MOVE
-        else:
-            return
-
-    def jump(self):
-        if self.state in [Player.JUMP, Player.FALLING]: return
-        else:
-            self.state = Player.JUMP
-            self.jump_on = True
+        elif pair == Player.KEYDOWN_X and self.attack is not True:
+            self.use_weapon()
 
     def state_check(self):
         if self.life == 0:
@@ -241,6 +204,10 @@ class Player:
             else:
                 self.state = Player.DAMAGED
             self.recover()
+            return
+
+        if self.attack == True:
+            self.state = Player.ATTACK
             return
 
         if self.dx is 0 and self.jump_speed is 0:
@@ -282,6 +249,59 @@ class Player:
         hh = 28
         x,y = self.draw_pos
         return x - hw, y - hh, x + hw, y + hh
+
+    def use_weapon(self):
+        self.time = 0
+        if self.grap_item == None:
+            self.attack = True
+        else:
+            pass
+        
+
+    def move(self):
+        if self.state in [Player.CROUCH, Player.CROUCH_MOVE]:
+            self.state = Player.CROUCH_MOVE
+        elif self.state in [Player.IDLE]:
+            self.state = Player.MOVE
+        else:
+            return
+
+    def jump(self):
+        if self.state in [Player.JUMP, Player.FALLING]: return
+        else:
+            self.state = Player.JUMP
+            self.jump_on = True
+
+    def dameged_just(self):
+        if self.dameged_time > 0:
+            return
+        self.life = max(0,self.life -1)
+        self.jump_speed += 0.5
+        self.rope_on = False
+        self.dameged_time = 1
+        if self.life is 0:
+            self.state = Player.STUN_DEATH
+
+    def dameged_to_stun(self):
+        if self.dameged_time > 0:
+            return
+        self.life = max(0,self.life -1)
+        self.state = Player.DAMAGED
+        self.time = 0
+        self.jump_speed += 0.5
+        self.rope_on = False
+        self.dameged = True
+        self.dameged_time = 1
+        if self.life is 0:
+            self.state = Player.STUN_DEATH
+
+    def recover(self):
+        if self.time > 1:
+            self.dameged = False
+            self.stun = False
+            self.state = Player.IDLE
+
+
 
     def get_ledder(self):
         dx = 0
@@ -365,7 +385,8 @@ class Player:
         l,b,r,t = tile.get_bb()
         dy = 0
         if foot > t:
-            if self.state in [Player.DAMAGED, Player.STUN_DEATH]: return dy
+            self.jump_speed -= Player.Gravity * gfw.delta_time   # 중력 적용
+            if self.state in [Player.DAMAGED, Player.STUN_DEATH, Player.ATTACK]: return dy
             if self.jump_speed > 0:
                 self.state = Player.JUMP
             else:

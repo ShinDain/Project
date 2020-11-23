@@ -8,12 +8,12 @@ map_pos = []
 room_shape = {}
 
 def make_all_map():
-    global entrance
+    global entrance, exit
     make_map_shape()
     select_room_shape()
     load_stage_data()
     
-    return entrance
+    return entrance, exit
 
 def make_map_shape():
     global entrance, exit

@@ -13,19 +13,22 @@ def enter():
     gfw.world.init(['bg','tile','player'])
     global player, bg
     
-
     bg = HorzScrollBackground('Background.png')
     gfw.world.add(gfw.layer.bg, bg)
     
-    x,y = all_stage_gen.make_all_map()
+    (e_x,e_y), (o_x,o_y) = all_stage_gen.make_all_map()
 
-    x = x * 640 + 320
-    y = y * 512 + 192
-    player = Player(x + 32,y + 32)
+    e_x = e_x * 640 + 320
+    e_y = e_y * 512 + 192
+    o_x = o_x * 640 + 320
+    o_y = o_y * 512 + 192
+    player = Player(e_x + 32,e_y + 32)
     gfw.world.add(gfw.layer.player, player)
 
     for t in gfw.world.objects_at(gfw.layer.tile):
-        if t.left == x and t.bottom == y and t.name is not 'entrance':
+        if t.left == e_x and t.bottom == e_y and t.name is not 'entrance':
+            gfw.world.remove(t)
+        elif t.left == o_x and t.bottom == o_y and t.name is not 'exit':
             gfw.world.remove(t)
 
     camera.camera_init()
@@ -44,15 +47,20 @@ def update():
     
 def reset():
     gfw.world.clear_at(gfw.layer.tile)
-    x, y = all_stage_gen.make_all_map()
+    (e_x,e_y), (o_x,o_y) = all_stage_gen.make_all_map()
 
-    x = x * 640 + 320
-    y = y * 512 + 192
-    player.reset(x + 32,y + 32)
+    e_x = e_x * 640 + 320
+    e_y = e_y * 512 + 192
+    o_x = o_x * 640 + 320
+    o_y = o_y * 512 + 192
+    player.reset(e_x + 32,e_y + 32)
 
     for t in gfw.world.objects_at(gfw.layer.tile):
-        if t.left == x and t.bottom == y and t.name is not 'entrance':
+        if t.left == e_x and t.bottom == e_y and t.name is not 'entrance':
             gfw.world.remove(t)
+        elif t.left == o_x and t.bottom == o_y and t.name is not 'exit':
+            gfw.world.remove(t)
+
 
 def draw():
     gfw.world.draw()
