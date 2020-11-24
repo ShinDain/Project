@@ -33,7 +33,7 @@ class Something:
 
         self.time = 0 
         self.mag = 2
-        self.speed = 100
+        self.speed = 0
 
         self.unit = 80
         self.left_gab = 0
@@ -79,6 +79,12 @@ class Something:
         hh = 32
         x,y = self.draw_pos
         return x - hw, y - 24, x + hw, y + hh
+
+    def collide(self):
+        gfw.world.remove(self)
+
+    def change_dx(self, dx):
+        self.dx = dx
 
     def get_tile(self):
         selected = None
@@ -142,3 +148,7 @@ class Something:
                 self.mag = 2
         else:
             self.mag = 2
+
+class Arrow(Something):
+    def collide(self):
+        pass

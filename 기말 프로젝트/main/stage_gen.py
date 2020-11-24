@@ -1,6 +1,6 @@
 import gfw
 from pico2d import *
-from tile import tile
+from tile import *
 import gobj
 import random
 
@@ -48,7 +48,7 @@ def create_object(ch, x, y):
             gfw.world.add(gfw.layer.tile, obj)
             x += BLOCK_SIZE
         elif ch[i] == 'A':
-            obj = tile('arrow_block', x, y)
+            obj = arrow_trap('arrow_block', x, y)
             gfw.world.add(gfw.layer.tile, obj)
             x += BLOCK_SIZE
         elif ch[i] == 'L':

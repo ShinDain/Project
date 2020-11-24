@@ -408,6 +408,9 @@ class Player:
         else:
             # print('falling', t, foot)
             if self.jump_speed <= 0 and int(foot) < t:
+                if tile.name == 'spike':
+                    self.life = 0
+                    self.dx = 0
                 dy = t - foot
                 if self.state is Player.DAMAGED: self.state = Player.STUN_DEATH
                 else: self.state = Player.MOVE

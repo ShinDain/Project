@@ -6,8 +6,8 @@ from background import HorzScrollBackground
 import all_stage_gen
 import camera
 import whip
-import box
-from collision import collide
+import objects
+from collision import *
 
 canvas_width = 1000
 canvas_height = 800
@@ -39,8 +39,8 @@ def enter():
     x,y = player.pos
     x += 64
     tmppos = x,y
-    box.load()
-    tmpbox = box.Something(tmppos, 'box')
+    objects.load()
+    tmpbox = objects.Something(tmppos, 'box')
     gfw.world.add(gfw.layer.object, tmpbox)
 
 def update():
@@ -64,7 +64,7 @@ def update():
 
 def draw():
     gfw.world.draw()
-    gobj.draw_collision_box()
+    #gobj.draw_collision_box()
 
 def handle_event(e):
     x, y = 0,0
@@ -89,13 +89,21 @@ def collide_check():
             for i in gfw.world.objects_at(gfw.layer.whip):
                 crash = collide(obj,i)
                 if crash == True:
-                    gfw.world.remove(obj)
+                    obj.collide()
 
     # 플레이어와 몬스터 충돌체크 
     for M in gfw.world.objects_at(gfw.layer.monster):
         crash = collide(M,player)
         if crash == True:
             player.dameged_to_stun()
+
+    # 함정 발동 
+    for layer in range(gfw.layer.object, gfw.layer.player + 1):
+        for obj in gfw.world.objects_at(layer):
+            for t in gfw.world.objects_at(gfw.layer.tile):
+                crash = active_arrow(obj,t)
+                if crash == True:
+                    t.active()
 
 def reset():
     for layer in range(gfw.layer.tile, gfw.layer.whip + 1):

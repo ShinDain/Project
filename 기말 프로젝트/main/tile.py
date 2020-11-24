@@ -1,6 +1,7 @@
 from pico2d import *
 import gfw
 import gobj
+import objects
 
 tilesetimage = None
 
@@ -53,6 +54,32 @@ class tile:
     def right(self):
         return self.left + self.unit
 
-class arrow_trap(tile):
-    def get_active_bb(self):
+    def active(self): 
         pass
+
+class arrow_trap(tile):
+    def __init__(self, name, left, bottom):
+        load()
+        self.left = left
+        self.bottom = bottom
+        self.left_gab = 0
+        self.bottom_gab = 0
+        self.unit = 64
+        self.name = name
+        self.rect = tile_rects[name]
+
+        self.shoot = False
+
+    def active(self):
+        if self.shoot is True: return
+
+        x = self.left + self.unit * 2 - self.left_gab
+        y = self.bottom + self.unit // 2 - self.bottom_gab
+        pos = x, y
+        self.shoot = True
+        arrow = objects.Arrow(pos, 'arrow')
+        #arrow.change_dx(5)
+        gfw.world.add(gfw.layer.object, arrow)
+
+    def get_active_bb(self):
+        return self.left + self.unit - self.left_gab, self.bottom - self.bottom_gab,self.left + self.unit * 5 - self.left_gab,self.bottom + self.unit - self.bottom_gab

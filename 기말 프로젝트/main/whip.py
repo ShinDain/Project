@@ -58,13 +58,13 @@ class Whip:
         x,y = self.pos
         if self.look_left == False:
             if self.fidx == 0:
-                return x - 50, y - 30, x + 10, y + 20
+                return x - 40, y - 30, x + 10, y + 20
             elif self.fidx == 1:
-                return x - 50, y - 30 , x + 10, y + 30
+                return x - 40, y - 30 , x + 10, y + 30
             elif self.fidx == 2:
-                return x - 50, y + 10, x + 10, y + 30
+                return x - 40, y + 10, x + 10, y + 30
             elif self.fidx == 3:
-                return x - 50, y + 10, x + 10, y + 40
+                return x - 40, y + 10, x + 10, y + 40
             elif self.fidx == 4:
                 return x - 20, y + 5 , x + 20, y + 35
             elif self.fidx == 5:
@@ -75,13 +75,13 @@ class Whip:
                 return x - 30, y - 20, x + 40, y
         else:
             if self.fidx == 0:
-                return x + 50, y - 30, x - 10, y + 20
+                return x + 40, y - 30, x - 10, y + 20
             elif self.fidx == 1:
-                return x + 50, y - 30, x - 10, y + 30
+                return x + 40, y - 30, x - 10, y + 30
             elif self.fidx == 2:
-                return x + 50, y + 10, x - 10, y + 40
+                return x + 40, y + 10, x - 10, y + 40
             elif self.fidx == 3:
-                return x + 50, y + 10, x - 10, y + 35
+                return x + 40, y + 10, x - 10, y + 35
             elif self.fidx == 4:
                 return x + 20, y + 5 , x - 20, y + 45
             elif self.fidx == 5:
