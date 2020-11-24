@@ -52,3 +52,7 @@ class tile:
         gfw.world.remove(self)
     def right(self):
         return self.left + self.unit
+
+class arrow_trap(tile):
+    def get_active_bb(self):
+        pass

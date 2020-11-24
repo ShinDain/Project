@@ -6,13 +6,15 @@ from background import HorzScrollBackground
 import all_stage_gen
 import camera
 import whip
+import box
+from collision import collide
 
 canvas_width = 1000
 canvas_height = 800
 
 def enter():
-    gfw.world.init(['bg','tile','object', 'whip','player'])
-    global player, bg
+    gfw.world.init(['bg','tile','object','monster', 'whip','player'])
+    global player, bg, box
     
     bg = HorzScrollBackground('Background.png')
     gfw.world.add(gfw.layer.bg, bg)
@@ -34,6 +36,13 @@ def enter():
 
     camera.camera_init()
 
+    x,y = player.pos
+    x += 64
+    tmppos = x,y
+    box.load()
+    tmpbox = box.Something(tmppos, 'box')
+    gfw.world.add(gfw.layer.object, tmpbox)
+
 def update():
     global player, bg
     gfw.world.update()
@@ -50,6 +59,43 @@ def update():
     p_x, p_y = player.draw_pos
     for i in gfw.world.objects_at(gfw.layer.whip):
         i.pos = (p_x, p_y)
+
+    collide_check()
+
+def draw():
+    gfw.world.draw()
+    gobj.draw_collision_box()
+
+def handle_event(e):
+    x, y = 0,0
+    # prev_dx = boy.dx0 
+    if e.type == SDL_QUIT:
+        gfw.quit()
+    elif e.type == SDL_KEYDOWN:
+        if e.key == SDLK_ESCAPE:
+            gfw.pop()
+        elif e.key == SDLK_7:
+            reset()
+
+    player.handle_event(e)
+
+def exit():
+    pass
+
+def collide_check():
+    # 채찍과 오브젝트 충돌체크
+    for layer in range(gfw.layer.object, gfw.layer.monster + 1):
+        for obj in gfw.world.objects_at(layer):
+            for i in gfw.world.objects_at(gfw.layer.whip):
+                crash = collide(obj,i)
+                if crash == True:
+                    gfw.world.remove(obj)
+
+    # 플레이어와 몬스터 충돌체크 
+    for M in gfw.world.objects_at(gfw.layer.monster):
+        crash = collide(M,player)
+        if crash == True:
+            player.dameged_to_stun()
 
 def reset():
     for layer in range(gfw.layer.tile, gfw.layer.whip + 1):
@@ -68,26 +114,6 @@ def reset():
             gfw.world.remove(t)
         elif t.left == o_x and t.bottom == o_y and t.name is not 'exit':
             gfw.world.remove(t)
-
-def draw():
-    gfw.world.draw()
-    gobj.draw_collision_box()
-    
-def handle_event(e):
-    x, y = 0,0
-    # prev_dx = boy.dx0 
-    if e.type == SDL_QUIT:
-        gfw.quit()
-    elif e.type == SDL_KEYDOWN:
-        if e.key == SDLK_ESCAPE:
-            gfw.pop()
-        elif e.key == SDLK_7:
-            reset()
-
-    player.handle_event(e)
-
-def exit():
-    pass
 
 if __name__ == '__main__':
     gfw.run_main()

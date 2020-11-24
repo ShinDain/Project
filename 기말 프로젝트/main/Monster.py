@@ -5,15 +5,18 @@ import gobj
 import tile
 from box import Something
 
+GRAVITY = 9
+
 class Monster(Something):
-    def __init__(self,pos,imageName):
+    def __init__(self,pos,name):
     self.pos = pos
     self.draw_pos = self.pos
     self.dy = 0
     self.dx = 0
-    self.image = gfw.image.load(imageName)
+    self.image = gfw.image.load(gobj.res('monster.png'))
     self.time = 0 
     self.mag = 2
+    self.name = name
 
     def update(self):
     	tile = self.get_tile()
