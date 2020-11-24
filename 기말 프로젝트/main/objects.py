@@ -79,11 +79,24 @@ class Something:
         x,y = self.draw_pos
         return x - hw, y - 24, x + hw, y + hh
 
+    def collide_whip(self, pos):
+        o_x, o_y = self.pos
+        p_x, p_y = pos
+        if o_x < p_x:
+            self.change_dx(-1)
+            self.change_dy(1)
+        else:
+            self.change_dx(1) 
+            self.change_dy(1)
+
     def collide(self):
         gfw.world.remove(self)
 
     def change_dx(self, dx):
         self.dx = dx
+
+    def change_dy(self, dy):
+        self.dy = dy        
 
     def get_tile(self):
         selected = None
@@ -96,7 +109,7 @@ class Something:
             if tile.name == 'ledder_top': continue
             l,b,r,t = tile.get_bb()
             if x < l - 10 or x > r + 10: continue
-            gab = (b + t) // 2 + 5
+            gab = (b + t) // 2 + 20
             if foot < gab: continue
             if selected is None:
                 selected = tile
@@ -141,9 +154,9 @@ class Something:
         if wall is not None:
             l,b,r,t = wall.get_bb()
             if self.dx < 0 and r > left and l < left:
-                self.dx = 0
+                self.dx = -self.dx // 2
             elif self.dx > 0 and l < right and l > left:
-                self.dx = 0
+                self.dx = -self.dx // 2 
             else:
                 self.mag = 2
         else:
@@ -176,15 +189,15 @@ class Arrow(Something):
         else:
             objectimage.clip_composite_draw(*self.rect,0,'h', *self.draw_pos, self.unit, self.unit)
 
-    def collide(self):
-        if self.dx == 0: return False
+    def collide(self, left):
+        if self.dx < 2: return False
         else:
-            self.dx = -self.dx / 2
+            self.dx = -self.dx // 2
             return True
 
     def get_bb(self):
         x,y = self.draw_pos
         if self.look_left == False:
-            return x, y - 12, x + 30, y + 5
+            return x - 30, y - 12, x + 30, y + 5
         else:
-            return x - 30, y - 12, x, y + 5
+            return x - 30, y - 12, x + 30, y + 5

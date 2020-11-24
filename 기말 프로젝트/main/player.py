@@ -251,7 +251,7 @@ class Player:
         self.draw_pos = pos
 
     def get_bb(self):
-        if self.state in [Player.CROUCH, Player.CROUCH_MOVE]:
+        if self.state in [Player.CROUCH, Player.CROUCH_MOVE, Player.STUN_DEATH]:
             hw = 24
             hh = 28
             x,y = self.draw_pos
@@ -434,9 +434,9 @@ class Player:
     def wall_check(self, wall,left, right):
         if wall is not None:
             l,b,r,t = wall.get_bb()
-            if self.look_left is True and r > left and l < left:
+            if self.dx == -1 and r > left and l < left:
                 self.mag = 0
-            elif self.look_left is not True and l < right and l > left:
+            elif self.dx == 1 and l < right and l > left:
                 self.mag = 0
             else:
                 self.mag = 2

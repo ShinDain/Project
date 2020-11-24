@@ -45,6 +45,11 @@ def enter():
 
 def update():
     global player, bg
+
+    collide_check_whip(player)
+    collide_check_trap()
+    collide_check_object(player)
+
     gfw.world.update()
     bg.speed = player.dx * 5
 
@@ -59,8 +64,6 @@ def update():
     p_x, p_y = player.draw_pos
     for i in gfw.world.objects_at(gfw.layer.whip):
         i.pos = (p_x, p_y)
-
-    collide_check()
 
 def draw():
     gfw.world.draw()
@@ -81,47 +84,6 @@ def handle_event(e):
 
 def exit():
     pass
-
-def collide_check():
-    # 채찍과 오브젝트 충돌체크
-    for layer in range(gfw.layer.box, gfw.layer.monster + 1):
-        for obj in gfw.world.objects_at(layer):
-            for i in gfw.world.objects_at(gfw.layer.whip):
-                crash = collide(obj,i)
-                if crash == True:
-                    obj.collide()
-
-    # 오브젝트와 오브젝트 충돌체크
-    for obj1 in gfw.world.objects_at(gfw.layer.object):
-        for obj2 in gfw.world.objects_at(gfw.layer.object):
-            if obj1 == obj2: continue
-            crash = collide(obj1,obj2)
-            if crash == True:
-                obj1.collide()
-                obj2.collide()
-
-
-    # 플레이어와 몬스터 충돌체크 
-    for M in gfw.world.objects_at(gfw.layer.monster):
-        crash = collide(M,player)
-        if crash == True:
-            player.dameged_to_stun()
-
-    # 플레이어와 오브젝트 충돌체크 
-    for obj in gfw.world.objects_at(gfw.layer.object):
-        crash = collide(obj,player)
-        if crash == True:
-            dameged = obj.collide()
-            if dameged == True:
-                player.dameged_to_stun()
-
-    # 함정 발동 
-    for layer in range(gfw.layer.object, gfw.layer.player + 1):
-        for obj in gfw.world.objects_at(layer):
-            for t in gfw.world.objects_at(gfw.layer.tile):
-                crash = active_arrow(obj,t)
-                if crash == True:
-                    t.active()
 
 def reset():
     for layer in range(gfw.layer.tile, gfw.layer.whip + 1):
