@@ -4,7 +4,7 @@ import gfw
 import gobj
 import tile
 
-GRAVITY = 9
+GRAVITY = 5
 
 objectimage = None
 object_rects = {}
@@ -89,7 +89,34 @@ class Something:
             self.change_dx(1) 
             self.change_dy(1)
 
+        if self.name == 'box':
+            select = random.choice(['stone', 'boom_pack', 'rope_pack'])
+            obj = Something(self.pos,select)
+            gfw.world.add(gfw.layer.object, obj)
+            self.remove()
+        elif self.name == 'treasure_box':
+            select = random.choice(['gold_bar','gold_top','gem1','gem2','gem3','gem4'])
+            score = 0
+            if select == 'gold_bar':
+                score = 100
+            elif select == 'gold_top':
+                score = 300
+            elif select == 'gem1':
+                score = 1000
+            elif select == 'gem2':
+                score = 2000
+            elif select == 'gem3':
+                score = 3000
+            elif select == 'gem4':
+                score = 5000
+            obj = Money(self.pos,select, score)
+            gfw.world.add(gfw.layer.score_object, obj)
+            self.remove()
+
     def collide(self):
+        pass
+
+    def remove(self):
         gfw.world.remove(self)
 
     def change_dx(self, dx):
@@ -189,11 +216,13 @@ class Arrow(Something):
         else:
             objectimage.clip_composite_draw(*self.rect,0,'h', *self.draw_pos, self.unit, self.unit)
 
-    def collide(self, left):
-        if self.dx < 2: return False
-        else:
+    def collide(self):
+        if self.dx > 2 or self.dx < -2  : 
             self.dx = -self.dx // 2
             return True
+        else:
+            return False
+            
 
     def get_bb(self):
         x,y = self.draw_pos
@@ -201,3 +230,28 @@ class Arrow(Something):
             return x - 30, y - 12, x + 30, y + 5
         else:
             return x - 30, y - 12, x + 30, y + 5
+
+class Money(Something):
+    def __init__(self,pos,name, score):
+        self.pos = pos
+        self.draw_pos = self.pos
+        self.dy = 0
+        self.dx = 0
+
+        self.name = name
+        self.rect = object_rects[name]
+
+        self.time = 0 
+        self.mag = 2
+        self.speed = 100
+
+        self.unit = 80
+        self.left_gab = 0
+        self.bottom_gab = 0
+
+        self.score = score
+
+    def collide(self):
+        self.remove()
+        return self.score
+

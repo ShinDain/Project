@@ -7,13 +7,13 @@ import all_stage_gen
 import camera
 import whip
 import objects
-from collision import *
+import collision 
 
 canvas_width = 1000
 canvas_height = 800
 
 def enter():
-    gfw.world.init(['bg','tile','box','object','monster', 'whip','player'])
+    gfw.world.init(['bg','tile','object','score_object','monster', 'whip','player'])
     global player, bg, box
     
     bg = HorzScrollBackground('Background.png')
@@ -40,15 +40,17 @@ def enter():
     x += 64
     tmppos = x,y
     objects.load()
-    tmpbox = objects.Something(tmppos, 'box')
-    gfw.world.add(gfw.layer.box, tmpbox)
+    tmpbox = objects.Something(tmppos, 'treasure_box')
+    gfw.world.add(gfw.layer.object, tmpbox)
 
 def update():
     global player, bg
 
-    collide_check_whip(player)
-    collide_check_trap()
-    collide_check_object(player)
+    collision.collide_check_whip(player)
+    collision.collide_check_trap()
+    collision.collide_check_object(player)
+    collision.collide_check_monster(player)
+    collision.collide_check_score(player)
 
     gfw.world.update()
     bg.speed = player.dx * 5
@@ -56,7 +58,7 @@ def update():
     p_draw_x, p_draw_y, left_gab, bottom_gab = camera.update(player)
 
     player.set_draw_pos((p_draw_x,p_draw_y))
-    for layer in range(gfw.layer.tile, gfw.layer.object + 1):
+    for layer in range(gfw.layer.tile, gfw.layer.monster + 1):
         for obj in gfw.world.objects_at(layer):
             obj.left_gab = left_gab
             obj.bottom_gab = bottom_gab

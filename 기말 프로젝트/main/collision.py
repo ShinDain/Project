@@ -28,29 +28,36 @@ def active_arrow(a,b):
 
 def collide_check_whip(player):
     # 채찍과 오브젝트 충돌체크
-    for layer in range(gfw.layer.box, gfw.layer.object + 1):
+    for layer in range(gfw.layer.object, gfw.layer.score_object + 1):
         for obj in gfw.world.objects_at(layer):
             for i in gfw.world.objects_at(gfw.layer.whip):
                 crash = collide(obj,i)
-                if crash == True:
-                    print('fjd')
-                    obj.collide_whip(player.pos)
+                if crash == False: continue
+                obj.collide_whip(player.pos)
 
 def collide_check_monster(player):
     # 플레이어와 몬스터 충돌체크 
     for M in gfw.world.objects_at(gfw.layer.monster):
         crash = collide(M,player)
-        if crash == True:
-            player.dameged_to_stun()
+        if crash == False: continue
+        player.dameged_to_stun()
 
 def collide_check_object(player):
     # 플레이어와 오브젝트 충돌체크 
     for obj in gfw.world.objects_at(gfw.layer.object):
         crash = collide(obj,player)
+        if crash == False: continue
+        dameged = obj.collide()
+        if dameged == True:
+            player.dameged_to_stun()
+
+def collide_check_score(player):
+    # 플레이어와 점수 충돌체크 
+    for obj in gfw.world.objects_at(gfw.layer.score_object):
+        crash = collide(obj,player)
         if crash == True:
-            dameged = obj.collide(player.pos)
-            if dameged == True:
-                player.dameged_to_stun()
+            score = obj.collide()
+            player.increase_score(score)
 
 def collide_check_trap():
     # 함정 발동 

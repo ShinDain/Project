@@ -92,6 +92,7 @@ class Player:
         self.attack = False
 
         self.life = 4
+        self.score = 0
 
     @property
     def state(self):
@@ -315,6 +316,9 @@ class Player:
             self.stun = False
             self.state = Player.IDLE
 
+    def increase_score(self, score):
+        self.score += score
+
     def get_ledder(self):
         dx = 0
         ledder = None
@@ -423,7 +427,7 @@ class Player:
         selected = None
         _,y = self.draw_pos
         for tile in gfw.world.objects_at(gfw.layer.tile):
-            if tile.name in ['entrance', 'exit']: continue
+            if tile.name in ['entrance', 'exit','spike']: continue
             if tile.name == 'ledder_bottom' or tile.name == 'ledder_top': continue
             l,b,r,t = tile.get_bb()
             if y > t or y < b: continue

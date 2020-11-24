@@ -81,9 +81,9 @@ class arrow_trap(tile):
         if self.shoot is True: return
 
         if self.look_left == True:
-            x = self.left
+            x = self.left + self.unit // 2 - 5
         else:
-            x = self.left + self.unit 
+            x = self.left + self.unit // 2 + 5
         y = self.bottom + self.unit // 2 
         pos = x, y
         self.shoot = True
