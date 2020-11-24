@@ -13,7 +13,7 @@ canvas_width = 1000
 canvas_height = 800
 
 def enter():
-    gfw.world.init(['bg','tile','object','monster', 'whip','player'])
+    gfw.world.init(['bg','tile','box','object','monster', 'whip','player'])
     global player, bg, box
     
     bg = HorzScrollBackground('Background.png')
@@ -41,7 +41,7 @@ def enter():
     tmppos = x,y
     objects.load()
     tmpbox = objects.Something(tmppos, 'box')
-    gfw.world.add(gfw.layer.object, tmpbox)
+    gfw.world.add(gfw.layer.box, tmpbox)
 
 def update():
     global player, bg
@@ -64,7 +64,7 @@ def update():
 
 def draw():
     gfw.world.draw()
-    #gobj.draw_collision_box()
+    gobj.draw_collision_box()
 
 def handle_event(e):
     x, y = 0,0
@@ -84,18 +84,36 @@ def exit():
 
 def collide_check():
     # 채찍과 오브젝트 충돌체크
-    for layer in range(gfw.layer.object, gfw.layer.monster + 1):
+    for layer in range(gfw.layer.box, gfw.layer.monster + 1):
         for obj in gfw.world.objects_at(layer):
             for i in gfw.world.objects_at(gfw.layer.whip):
                 crash = collide(obj,i)
                 if crash == True:
                     obj.collide()
 
+    # 오브젝트와 오브젝트 충돌체크
+    for obj1 in gfw.world.objects_at(gfw.layer.object):
+        for obj2 in gfw.world.objects_at(gfw.layer.object):
+            if obj1 == obj2: continue
+            crash = collide(obj1,obj2)
+            if crash == True:
+                obj1.collide()
+                obj2.collide()
+
+
     # 플레이어와 몬스터 충돌체크 
     for M in gfw.world.objects_at(gfw.layer.monster):
         crash = collide(M,player)
         if crash == True:
             player.dameged_to_stun()
+
+    # 플레이어와 오브젝트 충돌체크 
+    for obj in gfw.world.objects_at(gfw.layer.object):
+        crash = collide(obj,player)
+        if crash == True:
+            dameged = obj.collide()
+            if dameged == True:
+                player.dameged_to_stun()
 
     # 함정 발동 
     for layer in range(gfw.layer.object, gfw.layer.player + 1):

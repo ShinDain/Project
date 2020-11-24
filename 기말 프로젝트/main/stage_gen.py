@@ -48,7 +48,11 @@ def create_object(ch, x, y):
             gfw.world.add(gfw.layer.tile, obj)
             x += BLOCK_SIZE
         elif ch[i] == 'A':
-            obj = arrow_trap('arrow_block', x, y)
+            obj = arrow_trap('arrow_block', x, y, True)
+            gfw.world.add(gfw.layer.tile, obj)
+            x += BLOCK_SIZE
+        elif ch[i] == 'a':
+            obj = arrow_trap('arrow_block', x, y, False)
             gfw.world.add(gfw.layer.tile, obj)
             x += BLOCK_SIZE
         elif ch[i] == 'L':

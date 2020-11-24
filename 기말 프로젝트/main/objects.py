@@ -33,12 +33,11 @@ class Something:
 
         self.time = 0 
         self.mag = 2
-        self.speed = 0
+        self.speed = 100
 
         self.unit = 80
         self.left_gab = 0
         self.bottom_gab = 0
-
 
     def update(self):
         tile = self.get_tile()
@@ -121,6 +120,7 @@ class Something:
             if self.dy <= 0 and int(foot) < t:
                 dy = t - foot
                 self.dy = 0
+                self.dx = 0
                 # print('Now running', t, foot)
         return dy
 
@@ -141,14 +141,50 @@ class Something:
         if wall is not None:
             l,b,r,t = wall.get_bb()
             if self.dx < 0 and r > left and l < left:
-                self.mag = 0
+                self.dx = 0
             elif self.dx > 0 and l < right and l > left:
-                self.mag = 0
+                self.dx = 0
             else:
                 self.mag = 2
         else:
             self.mag = 2
 
 class Arrow(Something):
+    def __init__(self,pos,name, look):
+        self.pos = pos
+        self.draw_pos = self.pos
+        self.dy = 0
+        self.dx = 0
+
+        self.name = name
+        self.rect = object_rects[name]
+
+        self.time = 0 
+        self.mag = 2
+        self.speed = 100
+
+        self.unit = 80
+        self.left_gab = 0
+        self.bottom_gab = 0
+
+        self.look_left = look
+
+    def draw(self):
+        x, y = self.pos
+        if self.look_left is False:
+            objectimage.clip_draw(*self.rect, *self.draw_pos, self.unit, self.unit)
+        else:
+            objectimage.clip_composite_draw(*self.rect,0,'h', *self.draw_pos, self.unit, self.unit)
+
     def collide(self):
-        pass
+        if self.dx == 0: return False
+        else:
+            self.dx = -self.dx / 2
+            return True
+
+    def get_bb(self):
+        x,y = self.draw_pos
+        if self.look_left == False:
+            return x, y - 12, x + 30, y + 5
+        else:
+            return x - 30, y - 12, x, y + 5

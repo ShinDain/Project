@@ -58,7 +58,7 @@ class tile:
         pass
 
 class arrow_trap(tile):
-    def __init__(self, name, left, bottom):
+    def __init__(self, name, left, bottom, look):
         load()
         self.left = left
         self.bottom = bottom
@@ -69,17 +69,35 @@ class arrow_trap(tile):
         self.rect = tile_rects[name]
 
         self.shoot = False
+        self.look_left = look
+
+    def draw(self):
+        if self.look_left is False:
+            tilesetimage.clip_draw_to_origin(*self.rect, self.left - self.left_gab, self.bottom - self.bottom_gab, self.unit, self.unit)
+        else:
+            tilesetimage.clip_composite_draw(*self.rect,0,'h', self.left - self.left_gab + self.unit // 2, self.bottom - self.bottom_gab + self.unit // 2, self.unit, self.unit)
 
     def active(self):
         if self.shoot is True: return
 
-        x = self.left + self.unit * 2 - self.left_gab
-        y = self.bottom + self.unit // 2 - self.bottom_gab
+        if self.look_left == True:
+            x = self.left
+        else:
+            x = self.left + self.unit 
+        y = self.bottom + self.unit // 2 
         pos = x, y
         self.shoot = True
-        arrow = objects.Arrow(pos, 'arrow')
-        #arrow.change_dx(5)
+        arrow = objects.Arrow(pos, 'arrow', self.look_left)
+        if self.look_left == True:
+            arrow.change_dx(-5)
+        else:
+            arrow.change_dx(5)
         gfw.world.add(gfw.layer.object, arrow)
 
     def get_active_bb(self):
-        return self.left + self.unit - self.left_gab, self.bottom - self.bottom_gab,self.left + self.unit * 5 - self.left_gab,self.bottom + self.unit - self.bottom_gab
+        if self.look_left == True:
+            return self.left - self.left_gab - self.unit * 5, self.bottom - self.bottom_gab + 20,\
+            self.left - self.left_gab,self.bottom + self.unit - self.bottom_gab - 20
+        else:
+            return self.left + self.unit - self.left_gab, self.bottom - self.bottom_gab + 20,\
+            self.left + self.unit * 5 - self.left_gab,self.bottom + self.unit - self.bottom_gab - 20

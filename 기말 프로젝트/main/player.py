@@ -113,7 +113,7 @@ class Player:
             self.image.clip_composite_draw(sx, sy, self.size, self.size, 0 , 'h', *self.draw_pos, self.size,self.size)
 
     def update(self):
-        left,foot,right,_ = self.get_bb()                      # 바닥 체크
+        left,foot,right,_ = self.get_bb()           # 바닥 체크
         tile = self.get_tile(foot)
         wall = self.get_wall(left,right)
 
@@ -127,7 +127,7 @@ class Player:
         self.get_floor()
 
         x,y = self.pos
-        if self.state in [Player.ROPE_MOVE,Player.LOOKUP, Player.DAMAGED]:
+        if self.state in [Player.ROPE_MOVE,Player.LOOKUP, Player.DAMAGED, Player.STUN_DEATH]:
             pass
         else:
             x += self.dx * self.speed * self.mag * gfw.delta_time
@@ -175,7 +175,7 @@ class Player:
         # self.player.pos = point_add(self.player.pos, self.player.delta)
 
     def handle_event(self, e):
-        if self.state in [Player.STUN_DEATH]: return
+        if self.life == 0: return
         pair = (e.type, e.key)
         if pair in Player.KEY_MAP:
             if self.state in [Player.DAMAGED, Player.STUN_DEATH, Player.ATTACK]: pass
