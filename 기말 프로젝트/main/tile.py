@@ -41,6 +41,9 @@ class tile:
         else:
             tilesetimage.clip_draw_to_origin(*self.rect, self.left - self.left_gab, self.bottom - self.bottom_gab, self.unit, self.unit)
     def get_bb(self):
+        if self.name == 'spike':
+            return self.left - self.left_gab, self.bottom - self.bottom_gab, self.left + self.unit - self.left_gab, self.bottom + self.unit//2 - self.bottom_gab
+
         return self.left - self.left_gab, self.bottom - self.bottom_gab, self.left + self.unit - self.left_gab, self.bottom + self.unit - self.bottom_gab
     def move(self, dx, dy):
         self.left += dx

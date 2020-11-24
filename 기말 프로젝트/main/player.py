@@ -3,6 +3,7 @@ from pico2d import *
 import gfw
 import gobj
 import tile
+import whip
 
 FULL_MAP_WIDTH = 2560
 FULL_MAP_HEIGHT = 2048
@@ -56,6 +57,8 @@ class Player:
 
     #constructor
     def __init__(self,pos):
+        self.dx = 0
+        self.crouch = 0
         self.speed = 200
         self.image = gfw.image.load(gobj.res('Player.png'))        
         self.init(pos)
@@ -63,9 +66,7 @@ class Player:
     def init(self,pos):
         self.pos = pos
         self.draw_pos = self.pos
-        self.dx = 0
-        self.crouch = 0
-
+        
         self.jump_on = False
         self.jump_time = 0
         self.jump_speed = 0
@@ -107,9 +108,9 @@ class Player:
         sy = sy * self.size + 64
 
         if self.look_left is False:
-            self.image.clip_draw(sx, sy, self.size, self.size, *self.draw_pos, 80,80)
+            self.image.clip_draw(sx, sy, self.size, self.size, *self.draw_pos, self.size,self.size)
         else:
-            self.image.clip_composite_draw(sx, sy, self.size, self.size, 0 , 'h', *self.draw_pos, 80,80)
+            self.image.clip_composite_draw(sx, sy, self.size, self.size, 0 , 'h', *self.draw_pos, self.size,self.size)
 
     def update(self):
         left,foot,right,_ = self.get_bb()                      # 바닥 체크
@@ -156,11 +157,15 @@ class Player:
 
         if self.state in [Player.LOOKUP,Player.CROUCH, Player.FALLING, Player.JUMP] and self.fidx == len(self.anim) - 1:
             self.fidx = len(self.anim) - 1
-        elif self.state in [Player.DAMAGED] and self.fidx == len(self.anim) - 1:
+        elif self.state in [Player.DAMAGED] and self.fidx >= len(self.anim) - 1:
             self.stun = True
             self.time = 0
-        elif self.state in [Player.ATTACK] and self.fidx == len(self.anim) - 1:
+            self.fidx = 0
+        elif self.state in [Player.ATTACK] and self.fidx >= len(self.anim) - 1:
             self.attack = False
+            self.time = 0
+            self.fidx = 0
+            self.state = Player.IDLE
         else:
             frame = self.time * self.FPS
             self.fidx = int(frame) % len(self.anim)
@@ -191,7 +196,7 @@ class Player:
             self.jump()
         elif pair == Player.KEYUP_Z:
             self.jump_on = False
-        elif pair == Player.KEYDOWN_X and self.attack is not True:
+        elif pair == Player.KEYDOWN_X:
             self.use()
 
     def state_check(self):
@@ -226,12 +231,13 @@ class Player:
         if self.rope_on is True:
             self.state = Player.ROPE_MOVE
 
-
     def change_FPS(self):
         if self.state in [Player.MOVE]:
             self.FPS = 20
         elif self.state in [Player.LOOKUP, Player.CROUCH]:
             self.FPS = 10
+        elif self.state in [Player.ATTACK]:
+            self.FPS = 12
         else:
             self.FPS = 10
 
@@ -245,18 +251,25 @@ class Player:
         self.draw_pos = pos
 
     def get_bb(self):
+        if self.state in [Player.CROUCH, Player.CROUCH_MOVE]:
+            hw = 24
+            hh = 28
+            x,y = self.draw_pos
+            return x - hw, y - hh, x + hw, y
+
         hw = 24
         hh = 28
         x,y = self.draw_pos
         return x - hw, y - hh, x + hw, y + hh
 
     def use(self):
+        if self.attack == True : return
+        if self.grap_item is not None: return
         self.time = 0
-        if self.grap_item == None:
-            self.attack = True
-        else:
-            pass
-        
+        self.fidx = 0
+        self.attack = True
+        player_whip = whip.Whip(self.draw_pos, self.look_left)
+        gfw.world.add(gfw.layer.whip, player_whip)
 
     def move(self):
         if self.state in [Player.CROUCH, Player.CROUCH_MOVE]:
@@ -276,7 +289,7 @@ class Player:
         if self.dameged_time > 0:
             return
         self.life = max(0,self.life -1)
-        self.jump_speed += 0.5
+        self.jump_speed = 1.0
         self.rope_on = False
         self.dameged_time = 1
         if self.life is 0:
@@ -288,6 +301,7 @@ class Player:
         self.life = max(0,self.life -1)
         self.state = Player.DAMAGED
         self.time = 0
+        self.fidx = 0
         self.jump_speed += 0.5
         self.rope_on = False
         self.dameged = True
@@ -323,7 +337,9 @@ class Player:
                 self.jump_speed = -1
             elif self.crouch == 0 and self.rope_on is True:
                 self.jump_speed = 0
-                self.time = 0
+                if self.attack == False:
+                    self.time = 0
+                    self.fidx = 0
             if self.rope_on is True:
                 dx = x - (l + tile.unit // 2)
             if ledder is None:
@@ -423,3 +439,5 @@ class Player:
                 self.mag = 2
         else:
             self.mag = 2
+
+    

@@ -5,12 +5,13 @@ import gobj
 from background import HorzScrollBackground
 import all_stage_gen
 import camera
+import whip
 
 canvas_width = 1000
 canvas_height = 800
 
 def enter():
-    gfw.world.init(['bg','tile','player'])
+    gfw.world.init(['bg','tile','object', 'whip','player'])
     global player, bg
     
     bg = HorzScrollBackground('Background.png')
@@ -41,12 +42,19 @@ def update():
     p_draw_x, p_draw_y, left_gab, bottom_gab = camera.update(player)
 
     player.set_draw_pos((p_draw_x,p_draw_y))
-    for t in gfw.world.objects_at(gfw.layer.tile):
-        t.left_gab = left_gab
-        t.bottom_gab = bottom_gab
-    
+    for layer in range(gfw.layer.tile, gfw.layer.object + 1):
+        for obj in gfw.world.objects_at(layer):
+            obj.left_gab = left_gab
+            obj.bottom_gab = bottom_gab
+
+    p_x, p_y = player.draw_pos
+    for i in gfw.world.objects_at(gfw.layer.whip):
+        i.pos = (p_x, p_y)
+
 def reset():
-    gfw.world.clear_at(gfw.layer.tile)
+    for layer in range(gfw.layer.tile, gfw.layer.whip + 1):
+        gfw.world.clear_at(layer)
+
     (e_x,e_y), (o_x,o_y) = all_stage_gen.make_all_map()
 
     e_x = e_x * 640 + 320
@@ -63,7 +71,7 @@ def reset():
 
 def draw():
     gfw.world.draw()
-    #gobj.draw_collision_box()
+    gobj.draw_collision_box()
     
 def handle_event(e):
     x, y = 0,0
