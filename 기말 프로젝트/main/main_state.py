@@ -61,7 +61,6 @@ def reset():
         elif t.left == o_x and t.bottom == o_y and t.name is not 'exit':
             gfw.world.remove(t)
 
-
 def draw():
     gfw.world.draw()
     #gobj.draw_collision_box()
