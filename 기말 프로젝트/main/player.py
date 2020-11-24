@@ -7,6 +7,8 @@ import tile
 FULL_MAP_WIDTH = 2560
 FULL_MAP_HEIGHT = 2048
 
+GRAVITY = 9
+
 class Player:
     KEY_MAP = {
         (SDL_KEYDOWN, SDLK_LEFT):  (-1,  0),
@@ -52,16 +54,14 @@ class Player:
     STUN_DEATH, GRAB_WALL, ATTACK, THROW, LOOKUP, JUMP, \
     FALLING, PUSHING, ROPE_MOVE, OUT_STAGE, IN_STAGE = range(17)
 
-    Gravity = 9
-
     #constructor
-    def __init__(self,x,y):
+    def __init__(self,pos):
         self.speed = 200
         self.image = gfw.image.load(gobj.res('Player.png'))        
-        self.reset(x,y)
+        self.init(pos)
         
-    def reset(self,x,y):
-        self.pos = x,y
+    def init(self,pos):
+        self.pos = pos
         self.draw_pos = self.pos
         self.dx = 0
         self.crouch = 0
@@ -138,7 +138,7 @@ class Player:
             y += dy
         else: 
             self.state = Player.FALLING
-            self.jump_speed -= Player.Gravity * gfw.delta_time   # 중력 적용
+            self.jump_speed -= GRAVITY * gfw.delta_time   # 중력 적용
         if ledder is None:
             self.rope_on = False
 
@@ -192,7 +192,7 @@ class Player:
         elif pair == Player.KEYUP_Z:
             self.jump_on = False
         elif pair == Player.KEYDOWN_X and self.attack is not True:
-            self.use_weapon()
+            self.use()
 
     def state_check(self):
         if self.life == 0:
@@ -241,8 +241,8 @@ class Player:
         else:
             self.speed = 200
 
-    def set_draw_pos(self, x, y):
-        self.draw_pos = x, y
+    def set_draw_pos(self, pos):
+        self.draw_pos = pos
 
     def get_bb(self):
         hw = 24
@@ -250,7 +250,7 @@ class Player:
         x,y = self.draw_pos
         return x - hw, y - hh, x + hw, y + hh
 
-    def use_weapon(self):
+    def use(self):
         self.time = 0
         if self.grap_item == None:
             self.attack = True
@@ -300,8 +300,6 @@ class Player:
             self.dameged = False
             self.stun = False
             self.state = Player.IDLE
-
-
 
     def get_ledder(self):
         dx = 0
@@ -385,7 +383,7 @@ class Player:
         l,b,r,t = tile.get_bb()
         dy = 0
         if foot > t:
-            self.jump_speed -= Player.Gravity * gfw.delta_time   # 중력 적용
+            self.jump_speed -= GRAVITY * gfw.delta_time   # 중력 적용
             if self.state in [Player.DAMAGED, Player.STUN_DEATH, Player.ATTACK]: return dy
             if self.jump_speed > 0:
                 self.state = Player.JUMP

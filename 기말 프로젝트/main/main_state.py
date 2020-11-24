@@ -22,7 +22,7 @@ def enter():
     e_y = e_y * 512 + 192
     o_x = o_x * 640 + 320
     o_y = o_y * 512 + 192
-    player = Player(e_x + 32,e_y + 32)
+    player = Player((e_x + 32,e_y + 32))
     gfw.world.add(gfw.layer.player, player)
 
     for t in gfw.world.objects_at(gfw.layer.tile):
@@ -40,7 +40,7 @@ def update():
 
     p_draw_x, p_draw_y, left_gab, bottom_gab = camera.update(player)
 
-    player.set_draw_pos(p_draw_x,p_draw_y)
+    player.set_draw_pos((p_draw_x,p_draw_y))
     for t in gfw.world.objects_at(gfw.layer.tile):
         t.left_gab = left_gab
         t.bottom_gab = bottom_gab
@@ -53,7 +53,7 @@ def reset():
     e_y = e_y * 512 + 192
     o_x = o_x * 640 + 320
     o_y = o_y * 512 + 192
-    player.reset(e_x + 32,e_y + 32)
+    player.init((e_x + 32,e_y + 32))
 
     for t in gfw.world.objects_at(gfw.layer.tile):
         if t.left == e_x and t.bottom == e_y and t.name is not 'entrance':
