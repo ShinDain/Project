@@ -141,7 +141,7 @@ class Player:
         self.get_floor()
 
         x,y = self.pos
-        if self.state in [Player.ROPE_MOVE,Player.LOOKUP, Player.DAMAGED, Player.STUN_DEATH]:
+        if self.state in [Player.ROPE_MOVE,Player.LOOKUP, Player.DAMAGED, Player.STUN_DEATH, Player.GRAB_WALL]:
             pass
         else:
             x += self.dx * self.speed * self.mag * gfw.delta_time
@@ -338,6 +338,7 @@ class Player:
         self.hit_sound.play()
 
         if self.life is 0:
+            self.death_sound.play()
             self.state = Player.STUN_DEATH
 
     def dameged_to_stun(self):
@@ -354,6 +355,7 @@ class Player:
         self.dameged = True
         
         if self.life is 0:
+            self.death_sound.play()
             self.state = Player.STUN_DEATH
 
     def recover(self):
@@ -493,6 +495,10 @@ class Player:
                 self.mag = 2
             gab = (t + b) // 2
             if y > gab and self.jump_speed <= 0:
+                if self.wall_grab == True:
+                    self.wall_grab = True
+                    self.jump_speed = 0
+                    return
                 if self.dx == -1 and r > left and l < left:
                     self.pos = r - self.size // 2 , t
                     self.wall_grab = True
@@ -501,10 +507,6 @@ class Player:
                     self.pos = l - self.size // 2 , t
                     self.wall_grab = True
                     self.jump_speed = 0
-                elif self.dx == 0 and self.wall_grab == True:
-                    self.wall_grab = True
-                    self.jump_speed = 0
-
         else:
             self.mag = 2
 
