@@ -8,33 +8,29 @@ import camera
 import whip
 import objects
 import collision 
+import ui
 
 canvas_width = 1000
 canvas_height = 800
 
 def enter():
-    gfw.world.init(['bg','tile','object','score_object','monster', 'whip','player'])
-    global player, bg, box
+    gfw.world.init(['bg','tile','object','score_object','monster', 'whip','player','ui'])
+    global player, bg, player_ui
     
     bg = HorzScrollBackground('Background.png')
     gfw.world.add(gfw.layer.bg, bg)
     
     (e_x,e_y), (o_x,o_y) = all_stage_gen.make_all_map()
-
-    e_x = e_x * 640 + 320
-    e_y = e_y * 512 + 192
-    o_x = o_x * 640 + 320
-    o_y = o_y * 512 + 192
+    e_x,e_y,o_x,o_y = change_to_screen(e_x,e_y, o_x,o_y)
     player = Player((e_x + 32,e_y + 32))
     gfw.world.add(gfw.layer.player, player)
 
-    for t in gfw.world.objects_at(gfw.layer.tile):
-        if t.left == e_x and t.bottom == e_y and t.name is not 'entrance':
-            gfw.world.remove(t)
-        elif t.left == o_x and t.bottom == o_y and t.name is not 'exit':
-            gfw.world.remove(t)
-
+    clear_in_out(e_x,e_y,o_x,o_y)
+    ui.load()
     camera.camera_init()
+
+    player_ui = ui.Ui(player)
+    gfw.world.add(gfw.layer.ui, player_ui)
 
     x,y = player.pos
     x += 64
@@ -44,13 +40,10 @@ def enter():
     gfw.world.add(gfw.layer.object, tmpbox)
 
 def update():
-    global player, bg
+    global player, bg, player_ui
 
-    collision.collide_check_whip(player)
-    collision.collide_check_trap()
-    collision.collide_check_object(player)
-    collision.collide_check_monster(player)
-    collision.collide_check_score(player)
+    collision.collide_check(player)
+    player_ui.set_count(player)
 
     gfw.world.update()
     bg.speed = player.dx * 5
@@ -92,18 +85,24 @@ def reset():
         gfw.world.clear_at(layer)
 
     (e_x,e_y), (o_x,o_y) = all_stage_gen.make_all_map()
-
-    e_x = e_x * 640 + 320
-    e_y = e_y * 512 + 192
-    o_x = o_x * 640 + 320
-    o_y = o_y * 512 + 192
+    e_x,e_y,o_x,o_y = change_to_screen(e_x,e_y, o_x,o_y)
     player.init((e_x + 32,e_y + 32))
 
+    clear_in_out(e_x,e_y,o_x,o_y)
+
+def clear_in_out(x1,y1,x2,y2):
     for t in gfw.world.objects_at(gfw.layer.tile):
-        if t.left == e_x and t.bottom == e_y and t.name is not 'entrance':
+        if t.left == x1 and t.bottom == y1 and t.name is not 'entrance':
             gfw.world.remove(t)
-        elif t.left == o_x and t.bottom == o_y and t.name is not 'exit':
+        elif t.left == x2 and t.bottom == y2 and t.name is not 'exit':
             gfw.world.remove(t)
+
+def change_to_screen(x1,y1,x2,y2):
+    x1 = x1 * 640 + 320
+    y1 = y1 * 512 + 192
+    x2 = x2 * 640 + 320
+    y2 = y2 * 512 + 192
+    return x1,y1,x2,y2
 
 if __name__ == '__main__':
     gfw.run_main()

@@ -26,6 +26,13 @@ def active_arrow(a,b):
 
 	return True
 
+def collide_check(player):
+    collide_check_whip(player)
+    collide_check_trap()
+    collide_check_object(player)
+    collide_check_monster(player)
+    collide_check_score(player)
+
 def collide_check_whip(player):
     # 채찍과 오브젝트 충돌체크
     for layer in range(gfw.layer.object, gfw.layer.score_object + 1):

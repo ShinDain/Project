@@ -92,6 +92,8 @@ class Player:
         self.attack = False
 
         self.life = 4
+        self.boom_count = 4
+        self.rope_count = 4
         self.score = 0
 
     @property
@@ -287,26 +289,28 @@ class Player:
             self.jump_on = True
 
     def dameged_just(self):
-        if self.dameged_time > 0:
-            return
-        self.life = max(0,self.life -1)
+        if self.dameged_time > 0:pass
+        else: 
+            self.life = max(0,self.life -1)
+            self.dameged_time = 1
         self.jump_speed = 1.0
         self.rope_on = False
-        self.dameged_time = 1
+        
         if self.life is 0:
             self.state = Player.STUN_DEATH
 
     def dameged_to_stun(self):
-        if self.dameged_time > 0:
-            return
-        self.life = max(0,self.life -1)
+        if self.dameged_time > 0:pass
+        else:
+            self.life = max(0,self.life -1)
+            self.dameged_time = 1
         self.state = Player.DAMAGED
         self.time = 0
         self.fidx = 0
         self.jump_speed += 0.5
         self.rope_on = False
         self.dameged = True
-        self.dameged_time = 1
+        
         if self.life is 0:
             self.state = Player.STUN_DEATH
 

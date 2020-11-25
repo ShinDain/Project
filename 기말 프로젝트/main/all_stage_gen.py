@@ -3,6 +3,7 @@ from pico2d import *
 import gobj
 import random
 import stage_gen
+from tile import tile
 
 map_pos = []
 room_shape = {}
@@ -12,7 +13,7 @@ def make_all_map():
     make_map_shape()
     select_room_shape()
     load_stage_data()
-    
+    dont_fall_tile()
     return entrance, exit
 
 def make_map_shape():
@@ -89,3 +90,8 @@ def load_stage_data():
         map_x = map_x % 4
         load_count += 1
         map_y = load_count // 4
+
+def dont_fall_tile():
+    for i in range(40):
+        tmp = tile('cant_break',i * stage_gen.BLOCK_SIZE, - stage_gen.BLOCK_SIZE)
+        gfw.world.add(gfw.layer.tile,tmp)
