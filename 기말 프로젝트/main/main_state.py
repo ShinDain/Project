@@ -15,7 +15,7 @@ canvas_height = 800
 
 def enter():
     gfw.world.init(['bg','tile','object','score_object','monster', 'whip','player','ui'])
-    global player, bg, player_ui , main_bgm, black_canvas, black_pos
+    global player, bg, player_ui, main_bgm, black_canvas, black_pos
     
     bg = HorzScrollBackground('Background.png')
     gfw.world.add(gfw.layer.bg, bg)
@@ -44,7 +44,6 @@ def update():
     global player, bg, player_ui
 
     collision.collide_check(player)
-
     player_ui.set_count(player)
 
     gfw.world.update()
@@ -72,8 +71,14 @@ def update():
     else:
         if b_y < get_canvas_height():
             b_y += 10
-
     black_pos = b_x, b_y
+
+    if player.life == 0:
+        main_bgm.stop()
+    if player.death_time < 0:
+        main_bgm.repeat_play()
+        player.life = 4
+        reset()
 
 def draw():
     global black_canvas

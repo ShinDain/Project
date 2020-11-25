@@ -33,7 +33,7 @@ def update(player):
 		p_draw_x = cw // 2
 
 	if p_y < ch // 2:
-		bottom_gab = 0
+		bottom_gab = -10
 		p_draw_y = p_y
 	elif p_y > FULL_MAP_HEIGHT - ch // 2:
 		bottom_gab = FULL_MAP_HEIGHT - ch

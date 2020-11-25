@@ -61,6 +61,7 @@ class Player:
         self.crouch = 0
         self.speed = 200
         self.image = gfw.image.load(gobj.res('Player.png'))        
+        self.life = 4
         self.init(pos)
         
         self.hit_sound = load_wav('res/wav/hit.wav')
@@ -100,12 +101,12 @@ class Player:
         self.wall_grab = False
         self.attack = False
 
-        self.life = 4
         self.boom_count = 4
         self.rope_count = 4
         self.score = 0
 
         self.stage_clear = False
+        self.death_time = 8
 
     @property
     def state(self):
@@ -127,6 +128,14 @@ class Player:
             self.image.clip_composite_draw(sx, sy, self.size, self.size, 0 , 'h', *self.draw_pos, self.size,self.size)
 
     def update(self):
+        if self.life == 0:
+            if self.death_time == 8:
+                self.death_sound.play()
+                self.death_time -= gfw.delta_time
+            else:
+                self.death_time -= gfw.delta_time
+
+
         left,foot,right,_ = self.get_bb()           # 바닥 체크
         tile = self.get_tile(foot)
         wall = self.get_wall(left,right)
@@ -282,7 +291,7 @@ class Player:
 
     def set_volume(self):
         self.hit_sound.set_volume(20)
-        self.death_sound.set_volume(25)
+        self.death_sound.set_volume(10)
         self.jump_sound.set_volume(15)
         self.land_sound.set_volume(15)
         self.spike_sound.set_volume(20)
@@ -338,7 +347,7 @@ class Player:
         self.hit_sound.play()
 
         if self.life is 0:
-            self.death_sound.play()
+            self.wall_grab = False
             self.state = Player.STUN_DEATH
 
     def dameged_to_stun(self):
@@ -355,7 +364,7 @@ class Player:
         self.dameged = True
         
         if self.life is 0:
-            self.death_sound.play()
+            self.wall_grab = False
             self.state = Player.STUN_DEATH
 
     def recover(self):
