@@ -38,6 +38,7 @@ def collide_check_whip(player):
     for layer in range(gfw.layer.object, gfw.layer.score_object + 1):
         for obj in gfw.world.objects_at(layer):
             for i in gfw.world.objects_at(gfw.layer.whip):
+                if obj.time < 1: continue
                 crash = collide(obj,i)
                 if crash == False: continue
                 obj.collide_whip(player.pos)

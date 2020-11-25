@@ -16,6 +16,7 @@ class Whip:
         self.fidx = 0
         self.size = 80
         self.look_left = direction
+        self.sound = load_wav('res/wav/whip.wav')
 
     def update(self):
         self.time += gfw.delta_time

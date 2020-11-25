@@ -63,6 +63,14 @@ class Player:
         self.image = gfw.image.load(gobj.res('Player.png'))        
         self.init(pos)
         
+        self.hit_sound = load_wav('res/wav/hit.wav')
+        self.jump_sound = load_wav('res/wav/jump.wav')
+        self.land_sound = load_wav('res/wav/land.wav')
+        self.death_sound = load_wav('res/wav/death.wav')
+        self.spike_sound = load_wav('res/wav/spike_hit.wav')
+
+        self.set_volume()
+
     def init(self,pos):
         self.pos = pos
         self.draw_pos = self.pos
@@ -95,6 +103,8 @@ class Player:
         self.boom_count = 4
         self.rope_count = 4
         self.score = 0
+
+        self.stage_clear = False
 
     @property
     def state(self):
@@ -140,6 +150,8 @@ class Player:
         if tile is not None:
             dy = self.tile_check(tile,foot)
             y += dy
+            if dy != 0:
+                self.land_sound.play()
         else: 
             self.state = Player.FALLING
             self.jump_speed -= GRAVITY * gfw.delta_time   # 중력 적용
@@ -194,6 +206,8 @@ class Player:
                 self.dameged_just()
             elif e.key == SDLK_k:
                 self.dameged_to_stun()
+
+        if self.state in [Player.STUN_DEATH]: return
         if pair == Player.KEYDOWN_Z:
             self.rope_on = False 
             self.jump()
@@ -201,8 +215,14 @@ class Player:
             self.jump_on = False
         elif pair == Player.KEYDOWN_X:
             self.use()
+        elif pair == Player.KEYDOWN_SPACE:
+            self.clear_check()
 
     def state_check(self):
+        if self.stage_clear == True:
+            self.state = Player.OUT_STAGE
+            return
+
         if self.life == 0:
             self.state = Player.STUN_DEATH
             return
@@ -234,6 +254,12 @@ class Player:
         if self.rope_on is True:
             self.state = Player.ROPE_MOVE
 
+    def clear_check(self):
+        for t in gfw.layer.tile:
+            if t.name is 'exit':
+                self.stage_clear = True
+
+
     def change_FPS(self):
         if self.state in [Player.MOVE]:
             self.FPS = 20
@@ -249,6 +275,13 @@ class Player:
             self.speed = 50
         else:
             self.speed = 200
+
+    def set_volume(self):
+        self.hit_sound.set_volume(20)
+        self.death_sound.set_volume(25)
+        self.jump_sound.set_volume(15)
+        self.land_sound.set_volume(15)
+        self.spike_sound.set_volume(20)
 
     def set_draw_pos(self, pos):
         self.draw_pos = pos
@@ -272,6 +305,8 @@ class Player:
         self.fidx = 0
         self.attack = True
         player_whip = whip.Whip(self.draw_pos, self.look_left)
+        player_whip.sound.set_volume(10)
+        player_whip.sound.play()
         gfw.world.add(gfw.layer.whip, player_whip)
 
     def move(self):
@@ -287,6 +322,7 @@ class Player:
         else:
             self.state = Player.JUMP
             self.jump_on = True
+            self.jump_sound.play()
 
     def dameged_just(self):
         if self.dameged_time > 0:pass
@@ -295,7 +331,8 @@ class Player:
             self.dameged_time = 1
         self.jump_speed = 1.0
         self.rope_on = False
-        
+        self.hit_sound.play()
+
         if self.life is 0:
             self.state = Player.STUN_DEATH
 
@@ -304,6 +341,7 @@ class Player:
         else:
             self.life = max(0,self.life -1)
             self.dameged_time = 1
+        self.hit_sound.play()
         self.state = Player.DAMAGED
         self.time = 0
         self.fidx = 0
@@ -419,6 +457,7 @@ class Player:
                 if tile.name == 'spike':
                     self.life = 0
                     self.dx = 0
+                    self.spike_sound.play()
                 dy = t - foot
                 if self.state is Player.DAMAGED: self.state = Player.STUN_DEATH
                 else: self.state = Player.MOVE

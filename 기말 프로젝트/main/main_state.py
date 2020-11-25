@@ -15,7 +15,7 @@ canvas_height = 800
 
 def enter():
     gfw.world.init(['bg','tile','object','score_object','monster', 'whip','player','ui'])
-    global player, bg, player_ui
+    global player, bg, player_ui , clear_music
     
     bg = HorzScrollBackground('Background.png')
     gfw.world.add(gfw.layer.bg, bg)
@@ -32,17 +32,13 @@ def enter():
     player_ui = ui.Ui(player)
     gfw.world.add(gfw.layer.ui, player_ui)
 
-    x,y = player.pos
-    x += 64
-    tmppos = x,y
-    objects.load()
-    tmpbox = objects.Something(tmppos, 'treasure_box')
-    gfw.world.add(gfw.layer.object, tmpbox)
+    clear_music = load_wav('res/wav/fadeout.wav')
 
 def update():
     global player, bg, player_ui
 
     collision.collide_check(player)
+
     player_ui.set_count(player)
 
     gfw.world.update()

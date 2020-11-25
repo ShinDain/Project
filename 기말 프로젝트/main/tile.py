@@ -71,6 +71,8 @@ class arrow_trap(tile):
         self.shoot = False
         self.look_left = look
 
+        self.arrow_shoot_sound = load_wav('res/wav/arrowshot.wav')
+
     def draw(self):
         if self.look_left is False:
             tilesetimage.clip_draw_to_origin(*self.rect, self.left - self.left_gab, self.bottom - self.bottom_gab, self.unit, self.unit)
@@ -92,6 +94,7 @@ class arrow_trap(tile):
             arrow.change_dx(-5)
         else:
             arrow.change_dx(5)
+        self.arrow_shoot_sound.play()
         gfw.world.add(gfw.layer.object, arrow)
 
     def get_active_bb(self):
