@@ -100,6 +100,7 @@ class Player:
 
         self.wall_grab = False
         self.attack = False
+        self.throwing = False
 
         self.boom_count = 4
         self.rope_count = 4
@@ -134,7 +135,6 @@ class Player:
                 self.death_time -= gfw.delta_time
             else:
                 self.death_time -= gfw.delta_time
-
 
         left,foot,right,_ = self.get_bb()           # 바닥 체크
         tile = self.get_tile(foot)
@@ -188,6 +188,11 @@ class Player:
             self.fidx = 0
         elif self.state in [Player.ATTACK] and self.fidx >= len(self.anim) - 1:
             self.attack = False
+            self.time = 0
+            self.fidx = 0
+            self.state = Player.IDLE
+        elif self.state in [Player.THROW] and self.fidx >= len(self.anim) - 1:
+            self.throwing = False
             self.time = 0
             self.fidx = 0
             self.state = Player.IDLE
@@ -251,6 +256,10 @@ class Player:
             self.state = Player.GRAB_WALL
             return
 
+        if self.throwing == True:
+            self.state = Player.THROW
+            return
+
         if self.dx is 0 and self.jump_speed is 0:
             if self.crouch is 1:
                 self.state = Player.LOOKUP
@@ -311,9 +320,24 @@ class Player:
         x,y = self.draw_pos
         return x - hw, y - hh, x + hw, y + hh
 
+    def grab():
+        pass
+
+    def throw():
+        self.throwing = True
+        if self.look_left == True:
+            self.grap_item.change_dx(-3)
+        else
+            self.grap_item.change_dx(3)
+        self.grap_item.change_dy(0.5)
+        self.grap_item = None
+        self.time = 0
+
     def use(self):
         if self.attack == True : return
-        if self.grap_item is not None: return
+        if self.grap_item is not None: 
+            self.throw()
+            return
         self.time = 0
         self.fidx = 0
         self.attack = True

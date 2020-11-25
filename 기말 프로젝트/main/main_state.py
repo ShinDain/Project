@@ -40,6 +40,9 @@ def enter():
     main_bgm.set_volume(20)
     main_bgm.repeat_play()
 
+    box = objects.Something(player.pos, 'treasure_box')
+    gfw.world.add(gfw.layer.object,box)
+
 def update():
     global player, bg, player_ui
 

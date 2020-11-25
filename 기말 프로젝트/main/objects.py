@@ -105,9 +105,19 @@ class Something:
         self.remove_time = 1
 
         if self.name == 'box':
-            select = random.choice(['stone', 'boom_pack', 'rope_pack'])
-            obj = Something(self.pos,select)
-            gfw.world.add(gfw.layer.object, obj)
+            select = random.choice(['boom_pack', 'rope_pack', 'stone'])
+            score = 0
+            if select == 'boom_pack':
+                score = 3
+                obj = Money(self.pos,select, score)
+                gfw.world.add(gfw.layer.score_object, obj)
+            elif select == 'rope_pack':
+                score = 3
+                obj = Money(self.pos,select, score)
+                gfw.world.add(gfw.layer.score_object, obj)
+            elif select == 'stone':
+                obj = Something(self.pos,select)
+                gfw.world.add(gfw.layer.object, obj)
             
         elif self.name == 'treasure_box':
             select = random.choice(['gold_bar','gold_top','gem1','gem2','gem3','gem4'])
@@ -127,7 +137,6 @@ class Something:
             obj = Money(self.pos,select, score)
             gfw.world.add(gfw.layer.score_object, obj)
             
-
     def collide(self):
         pass
 
@@ -309,7 +318,6 @@ class Money(Something):
         return self.score
 
     def collide_whip(self, pos):
-
         o_x, o_y = self.pos
         p_x, p_y = pos
         if o_x < p_x:
@@ -321,3 +329,12 @@ class Money(Something):
 
         self.collide_sound.play()
         self.time = 0
+
+    def get_bb(self):
+        x,y = self.draw_pos
+        if self.name == 'gold_bar':
+            return x - 12, y - 10, x + 12, y + 8
+        elif self.name == 'gold_top':
+            return x - 25, y - 10, x + 25, y + 12
+        else:
+            return x - 15, y - 24, x + 15, y + 10
