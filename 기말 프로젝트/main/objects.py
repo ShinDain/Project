@@ -212,7 +212,7 @@ class Arrow(Something):
         self.dx = 0
 
         self.name = name
-        self.rect = object_rects[name]
+        self.rect = (640,864,80,80)
 
         self.time = 0 
         self.mag = 2
@@ -228,7 +228,6 @@ class Arrow(Something):
         self.collide_sound = load_wav('res/wav/arrowhitwall.wav')
 
     def draw(self):
-        x, y = self.pos
         if self.look_left is False:
             objectimage.clip_draw(*self.rect, *self.draw_pos, self.unit, self.unit)
         else:

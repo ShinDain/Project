@@ -39,7 +39,7 @@ class Player:
     [0xA5,0xA6,0xA7,0xA8,0xA9,0xAA,0xAB], # 기어서 이동
     [0x90,0x91,0x92,0x93], # 피격중
     [0xB9], # 기절, 사망
-    [0x88,0x89,0x8A,0xB8], # 벽잡기
+    [0x88,0x89,0x8A,0x8B], # 벽잡기
     [0x70,0x71,0x72,0x73,0x74,0x75], # 공격(채찍질)
     [0x76,0x77,0x78,0x79,0x7A], # 던지기
     [0x30,0x31,0x32,0x33], # 올려다보기
@@ -97,6 +97,7 @@ class Player:
 
         self.grap_item = None
 
+        self.wall_grab = False
         self.attack = False
 
         self.life = 4
@@ -170,7 +171,7 @@ class Player:
 
         self.state_check()
 
-        if self.state in [Player.LOOKUP,Player.CROUCH, Player.FALLING, Player.JUMP] and self.fidx == len(self.anim) - 1:
+        if self.state in [Player.LOOKUP,Player.CROUCH, Player.FALLING, Player.JUMP, Player.GRAB_WALL] and self.fidx == len(self.anim) - 1:
             self.fidx = len(self.anim) - 1
         elif self.state in [Player.DAMAGED] and self.fidx >= len(self.anim) - 1:
             self.stun = True
@@ -190,7 +191,6 @@ class Player:
         # self.player.pos = point_add(self.player.pos, self.player.delta)
 
     def handle_event(self, e):
-        if self.life == 0: return
         pair = (e.type, e.key)
         if pair in Player.KEY_MAP:
             if self.state in [Player.DAMAGED, Player.STUN_DEATH, Player.ATTACK]: pass
@@ -200,7 +200,6 @@ class Player:
                 self.fidx = 2
             self.dx += Player.KEY_MAP[pair][0]
             self.crouch += Player.KEY_MAP[pair][1]
-        # print(dx, pdx, self.action)
         if e.type == SDL_KEYDOWN:
             if e.key == SDLK_l:
                 self.dameged_just()
@@ -209,6 +208,7 @@ class Player:
 
         if self.state in [Player.STUN_DEATH]: return
         if pair == Player.KEYDOWN_Z:
+            self.wall_grab = False
             self.rope_on = False 
             self.jump()
         elif pair == Player.KEYUP_Z:
@@ -238,6 +238,10 @@ class Player:
             self.state = Player.ATTACK
             return
 
+        if self.wall_grab == True:
+            self.state = Player.GRAB_WALL
+            return
+
         if self.dx is 0 and self.jump_speed is 0:
             if self.crouch is 1:
                 self.state = Player.LOOKUP
@@ -255,7 +259,7 @@ class Player:
             self.state = Player.ROPE_MOVE
 
     def clear_check(self):
-        for t in gfw.layer.tile:
+        for t in gfw.world.objects_at(gfw.layer.tile):
             if t.name is 'exit':
                 self.stage_clear = True
 
@@ -456,7 +460,6 @@ class Player:
             if self.jump_speed <= 0 and int(foot) < t:
                 if tile.name == 'spike':
                     self.life = 0
-                    self.dx = 0
                     self.spike_sound.play()
                 dy = t - foot
                 if self.state is Player.DAMAGED: self.state = Player.STUN_DEATH
@@ -479,6 +482,7 @@ class Player:
         return selected
 
     def wall_check(self, wall,left, right):
+        x,y = self.draw_pos
         if wall is not None:
             l,b,r,t = wall.get_bb()
             if self.dx == -1 and r > left and l < left:
@@ -487,6 +491,20 @@ class Player:
                 self.mag = 0
             else:
                 self.mag = 2
+            gab = (t + b) // 2
+            if y > gab and self.jump_speed <= 0:
+                if self.dx == -1 and r > left and l < left:
+                    self.pos = r - self.size // 2 , t
+                    self.wall_grab = True
+                    self.jump_speed = 0
+                elif self.dx == 1 and l < right and l > left:
+                    self.pos = l - self.size // 2 , t
+                    self.wall_grab = True
+                    self.jump_speed = 0
+                elif self.dx == 0 and self.wall_grab == True:
+                    self.wall_grab = True
+                    self.jump_speed = 0
+
         else:
             self.mag = 2
 

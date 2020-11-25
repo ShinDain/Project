@@ -41,29 +41,40 @@ def create_column():
         y += BLOCK_SIZE
     print('map_index:', map_index)
 
+def remove_double(x,y):
+    for t in gfw.world.objects_at(gfw.layer.tile):
+            if t.left == x and t.bottom == y:
+                gfw.world.remove(t)
+
 def create_object(ch, x, y):
     for i in range(len(ch)):
         if ch[i] == '1':
+            remove_double(x,y)
             obj = tile('cave_block', x, y)
             gfw.world.add(gfw.layer.tile, obj)
             x += BLOCK_SIZE
         elif ch[i] == 'A':
+            remove_double(x,y)
             obj = arrow_trap('arrow_block', x, y, True)
             gfw.world.add(gfw.layer.tile, obj)
             x += BLOCK_SIZE
         elif ch[i] == 'a':
+            remove_double(x,y)
             obj = arrow_trap('arrow_block', x, y, False)
             gfw.world.add(gfw.layer.tile, obj)
             x += BLOCK_SIZE
         elif ch[i] == 'L':
+            remove_double(x,y)
             obj = tile('ledder_top', x, y)
             gfw.world.add(gfw.layer.tile, obj)
             x += BLOCK_SIZE
         elif ch[i] == 'l':
+            remove_double(x,y)
             obj = tile('ledder_bottom', x, y)
             gfw.world.add(gfw.layer.tile, obj)
             x += BLOCK_SIZE
         elif ch[i] == 'S':
+            remove_double(x,y)
             obj = tile('spike', x, y)
             gfw.world.add(gfw.layer.tile, obj)
             x += BLOCK_SIZE

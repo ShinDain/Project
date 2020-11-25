@@ -15,7 +15,7 @@ canvas_height = 800
 
 def enter():
     gfw.world.init(['bg','tile','object','score_object','monster', 'whip','player','ui'])
-    global player, bg, player_ui , clear_music
+    global player, bg, player_ui , main_bgm, black_canvas, black_pos
     
     bg = HorzScrollBackground('Background.png')
     gfw.world.add(gfw.layer.bg, bg)
@@ -27,12 +27,18 @@ def enter():
 
     clear_in_out(e_x,e_y,o_x,o_y)
     ui.load()
+    objects.load()
     camera.camera_init()
 
     player_ui = ui.Ui(player)
     gfw.world.add(gfw.layer.ui, player_ui)
 
-    clear_music = load_wav('res/wav/fadeout.wav')
+    black_canvas = gfw.image.load('res/black.png')
+    black_pos = 0, get_canvas_height() + 600
+
+    main_bgm = load_music('res/stage_bgm.mp3')
+    main_bgm.set_volume(20)
+    main_bgm.repeat_play()
 
 def update():
     global player, bg, player_ui
@@ -56,9 +62,24 @@ def update():
     for i in gfw.world.objects_at(gfw.layer.whip):
         i.pos = (p_x, p_y)
 
+    global black_canvas, black_pos
+    b_x, b_y = black_pos
+    if player.stage_clear == True:
+        if b_y > 0:
+            b_y -= 10
+        else:
+            reset()
+    else:
+        if b_y < get_canvas_height():
+            b_y += 10
+
+    black_pos = b_x, b_y
+
 def draw():
+    global black_canvas
     gfw.world.draw()
     gobj.draw_collision_box()
+    black_canvas.draw_to_origin(*black_pos,get_canvas_width(), get_canvas_height())
 
 def handle_event(e):
     x, y = 0,0
@@ -74,7 +95,8 @@ def handle_event(e):
     player.handle_event(e)
 
 def exit():
-    pass
+    global main_bgm
+    del main_bgm
 
 def reset():
     for layer in range(gfw.layer.tile, gfw.layer.whip + 1):
