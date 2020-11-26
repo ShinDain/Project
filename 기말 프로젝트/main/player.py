@@ -327,7 +327,7 @@ class Player:
         self.throwing = True
         if self.look_left == True:
             self.grap_item.change_dx(-3)
-        else
+        else:
             self.grap_item.change_dx(3)
         self.grap_item.change_dy(0.5)
         self.grap_item = None
