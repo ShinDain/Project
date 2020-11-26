@@ -62,6 +62,7 @@ class Something:
             self.dy -= GRAVITY * gfw.delta_time   # 중력 적용
 
         self.wall_check(wall)
+        self.get_floor()
 
         x = clamp(20, x,FULL_MAP_WIDTH - 20)
         y = clamp(0, y,FULL_MAP_HEIGHT)
@@ -212,6 +213,22 @@ class Something:
                 self.mag = 2
         else:
             self.mag = 2
+
+    def get_floor(self):
+        x, y = self.draw_pos
+        _,_,_,P_top = self.get_bb()
+        for tile in gfw.world.objects_at(gfw.layer.tile):
+            if tile.name in ['entrance', 'exit']: continue
+            if tile.name == 'ledder_bottom' or tile.name == 'ledder_top': continue
+            l,b,r,t = tile.get_bb()
+            if x > r + 10 or x < l - 10: continue
+            gab = (b + t) // 2
+            if y > gab: continue
+            if P_top < b:
+                pass
+            else:
+                if self.dy > 0:
+                    self.dy = 0
 
 class Arrow(Something):
     def __init__(self,pos,name, look):
