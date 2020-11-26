@@ -43,6 +43,11 @@ def enter():
     box = objects.Something(player.pos, 'treasure_box')
     gfw.world.add(gfw.layer.object,box)
 
+    global fade_in_sound, fade_out_sound
+    fade_in_sound = load_wav('res/wav/fadein.wav')
+    fade_out_sound = load_wav('res/wav/fadein.wav')
+
+
 def update():
     global player, bg, player_ui
 
@@ -70,6 +75,7 @@ def update():
         if b_y > 0:
             b_y -= 10
         else:
+            fade_out_sound.play()
             reset()
     else:
         if b_y < get_canvas_height():

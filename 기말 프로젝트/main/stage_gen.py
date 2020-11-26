@@ -93,7 +93,7 @@ def create_object(ch, x, y):
 def get(x, y):
     col = x % UNIT_PER_LINE
     row = x * SCREEN_LINES + SCREEN_LINES - y - 1
-    print('lines[row] = ', lines[row])
+    #print('lines[row] = ', lines[row])
     return lines[row]
 
 def test_gen_2():

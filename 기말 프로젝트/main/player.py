@@ -160,7 +160,7 @@ class Player:
         if tile is not None:
             dy = self.tile_check(tile,foot)
             y += dy
-            if dy != 0:
+            if dy > 1:
                 self.land_sound.play()
         else: 
             self.state = Player.FALLING
@@ -281,7 +281,6 @@ class Player:
             if t.name is 'exit':
                 self.stage_clear = True
 
-
     def change_FPS(self):
         if self.state in [Player.MOVE]:
             self.FPS = 20
@@ -386,10 +385,21 @@ class Player:
         self.jump_speed += 0.5
         self.rope_on = False
         self.dameged = True
-        
+        self.wall_grab = False
         if self.life is 0:
-            self.wall_grab = False
             self.state = Player.STUN_DEATH
+
+    def dameged_to_die(self):
+        self.life = 0
+        self.dameged_time = 1
+        self.hit_sound.play()
+        self.time = 0
+        self.fidx = 0
+        self.jump_speed += 0.5
+        self.rope_on = False
+        self.dameged = True
+        self.wall_grab = False
+        self.state = Player.STUN_DEATH
 
     def recover(self):
         if self.time > 1:
@@ -409,16 +419,15 @@ class Player:
             if tile.name is not 'ledder_top' and tile.name is not 'ledder_bottom': continue
             l,b,r,t = tile.get_bb()
             if x > r or x < l: continue
-            if tile.name is 'ledder_top' and P_bottom - 5 < t and self.crouch == -1 : 
+            if tile.name is 'ledder_top' and y > t and y < t + tile.unit and self.crouch == -1 : 
                 self.rope_on = True
                 self.jump_speed = -1
                 ledder = tile
-            if y < b or y > t: continue
+            if y < b or y > t + 20: continue
             if self.crouch == 1:
                 self.rope_on = True
                 self.jump_speed = 1
-            elif self.crouch == -1:
-                self.rope_on = True
+            elif self.crouch == -1 and self.rope_on == True:
                 self.jump_speed = -1
             elif self.crouch == 0 and self.rope_on is True:
                 self.jump_speed = 0
