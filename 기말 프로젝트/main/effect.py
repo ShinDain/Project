@@ -67,5 +67,8 @@ class Explosion_effect:
         gfw.world.remove(self)
 
     def get_bb(self):
+        if self.time > 0.1:
+            return 0,0,0,0
+
         x,y = self.draw_pos
-        return x - tile.BLOCK_SIZE * 2, y - tile.BLOCK_SIZE * 2, x + tile.BLOCK_SIZE * 2, y + tile.BLOCK_SIZE * 2
+        return x - tile.BLOCK_SIZE * 1.5, y - tile.BLOCK_SIZE * 1.5, x + tile.BLOCK_SIZE * 1.5, y + tile.BLOCK_SIZE * 1.5

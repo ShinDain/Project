@@ -430,6 +430,13 @@ class Bomb(Something):
 
         if self.remove_time < 0:
             self.explosion()
+        elif self.remove_time < 2.5:
+            if self.name != 'boom2':
+                self.name = 'boom2' 
+            else:
+                self.name = 'boom3'
+                
+        self.rect = object_rects[self.name]
 
     def draw(self):
         x, y = self.pos

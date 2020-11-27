@@ -8,6 +8,7 @@ import camera
 import whip
 import objects
 import collision 
+import monster
 import ui
 
 canvas_width = 1000
@@ -40,8 +41,9 @@ def enter():
     main_bgm.set_volume(10)
     main_bgm.repeat_play()
 
-    box = objects.Bomb(player.pos, 'boom1')
-    gfw.world.add(gfw.layer.object,box)
+    tmpx, tmpy = player.pos
+    snake = monster.Monster((tmpx + 160, tmpy), 'snake')
+    gfw.world.add(gfw.layer.monster,snake)
 
     global fade_in_sound, fade_out_sound
     fade_in_sound = load_wav('res/wav/fadein.wav')
@@ -90,6 +92,8 @@ def update():
     if player.death_time < 0:
         main_bgm.repeat_play()
         player.life = 4
+        player.boom_count = 4
+        player.rope_count = 4
         reset()
 
 def draw():
@@ -107,6 +111,9 @@ def handle_event(e):
         if e.key == SDLK_ESCAPE:
             gfw.pop()
         elif e.key == SDLK_7:
+            player.life = 4
+            player.boom_count = 4
+            player.rope_count = 4
             reset()
 
     player.handle_event(e)

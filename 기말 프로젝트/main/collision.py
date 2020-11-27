@@ -35,7 +35,7 @@ def collide_check(player):
 
 def collide_check_whip(player):
     # 채찍과 오브젝트 충돌체크
-    for layer in range(gfw.layer.object, gfw.layer.score_object + 1):
+    for layer in range(gfw.layer.object, gfw.layer.monster + 1):
         for obj in gfw.world.objects_at(layer):
             for i in gfw.world.objects_at(gfw.layer.whip):
                 if obj.time < 1: continue
@@ -48,7 +48,7 @@ def collide_check_monster(player):
     for M in gfw.world.objects_at(gfw.layer.monster):
         crash = collide(M,player)
         if crash == False: continue
-        player.dameged_to_stun()
+        player.dameged_just()
 
 def collide_check_object(player):
     # 플레이어와 오브젝트 충돌체크 

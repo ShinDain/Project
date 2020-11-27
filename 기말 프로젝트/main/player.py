@@ -5,6 +5,7 @@ import gobj
 import tile
 import whip
 import collision
+import objects
 
 FULL_MAP_WIDTH = 2560
 FULL_MAP_HEIGHT = 2048
@@ -63,6 +64,8 @@ class Player:
         self.speed = 200
         self.image = gfw.image.load(gobj.res('Player.png'))        
         self.life = 4
+        self.boom_count = 4
+        self.rope_count = 4
         self.init(pos)
         
         self.hit_sound = load_wav('res/wav/hit.wav')
@@ -105,8 +108,6 @@ class Player:
         self.attack = False
         self.throwing = False
 
-        self.boom_count = 4
-        self.rope_count = 4
         self.score = 0
 
         self.stage_clear = False
@@ -234,6 +235,8 @@ class Player:
                 self.dameged_just()
             elif e.key == SDLK_k:
                 self.dameged_to_stun()
+            elif e.key == SDLK_s:
+                self.use_bomb()
 
         if self.state in [Player.STUN_DEATH]: return
         if pair == Player.KEYDOWN_Z:
@@ -343,6 +346,40 @@ class Player:
         x,y = self.draw_pos
         return x - hw, y - hh, x + hw, y + hh
 
+    def use_bomb(self):
+        if self.boom_count == 0: return
+        self.boom_count -= 1
+        bomb = objects.Bomb(self.pos, 'boom1')
+        gfw.world.add(gfw.layer.object,bomb)
+        dx, dy = 0,0
+        
+        if self.crouch == 1:
+            if self.look_left == True:
+                dx -= 4
+            else:
+                dx += 4
+            dy += 5
+        elif self.crouch == -1:
+            if self.look_left == True:
+                dx -= 2
+            else:
+                dx += 2
+            dy += 0.2
+        else:
+            if self.look_left == True:
+                dx -= 4
+            else:
+                dx += 4
+            dy += 1
+            
+        bomb.change_dx(dx)
+        bomb.change_dy(dy)
+
+        self.time = 0
+        self.fidx = 0
+        self.throwing = True
+        self.throw_sound.play()
+
     def grab(self):
         x,_ = self.draw_pos
         p_l,p_b,p_r,p_t = self.get_bb()
@@ -420,7 +457,7 @@ class Player:
             self.jump_sound.play()
 
     def dameged_just(self):
-        if self.dameged_time > 0:pass
+        if self.dameged_time > 0:return
         else: 
             self.life = max(0,self.life -1)
             self.dameged_time = 1
@@ -433,7 +470,7 @@ class Player:
             self.state = Player.STUN_DEATH
 
     def dameged_to_stun(self):
-        if self.dameged_time > 0:pass
+        if self.dameged_time > 0:return
         else:
             self.life = max(0,self.life -1)
             self.dameged_time = 1
@@ -449,16 +486,14 @@ class Player:
             self.state = Player.STUN_DEATH
 
     def dameged_to_die(self):
-        self.life = 0
-        self.dameged_time = 1
-        self.hit_sound.play()
+        if self. life > 0:
+            self.life = 0
         self.time = 0
         self.fidx = 0
         self.jump_speed += 0.5
         self.rope_on = False
         self.dameged = True
         self.wall_grab = False
-        self.state = Player.STUN_DEATH
 
     def recover(self):
         if self.time > 1:
