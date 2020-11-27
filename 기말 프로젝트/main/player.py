@@ -4,6 +4,7 @@ import gfw
 import gobj
 import tile
 import whip
+import collision
 
 FULL_MAP_WIDTH = 2560
 FULL_MAP_HEIGHT = 2048
@@ -187,6 +188,7 @@ class Player:
                 self.grab_item.look_left = False
                 tmpx += 20
             pos = tmpx, tmpy
+            self.grab_item.change_dy(0)
             self.grab_item.set_pos(pos)
 
         self.state_check()
@@ -218,7 +220,7 @@ class Player:
     def handle_event(self, e):
         pair = (e.type, e.key)
         if pair in Player.KEY_MAP:
-            if self.state in [Player.DAMAGED, Player.STUN_DEATH, Player.ATTACK]: pass
+            if self.state in [Player.DAMAGED, Player.STUN_DEATH, Player.ATTACK, Player.THROW]: pass
             else:
                 self.time = 0
             if self.state is Player.CROUCH_MOVE:
@@ -250,12 +252,14 @@ class Player:
 
         if self.life == 0:
             self.state = Player.STUN_DEATH
+            self.wall_grab = False
             return
         if self.dameged == True:
             if self.stun == True:
                 self.state = Player.STUN_DEATH
             else:
                 self.state = Player.DAMAGED
+                self.wall_grab = False
             self.recover()
             return
 
@@ -288,9 +292,14 @@ class Player:
             self.state = Player.ROPE_MOVE
 
     def clear_check(self):
+        x,y = self.draw_pos
         for t in gfw.world.objects_at(gfw.layer.tile):
-            if t.name is 'exit':
-                self.stage_clear = True
+            if t.name is not 'exit': continue
+            l,b,r,t = t.get_bb()
+            if x > r or x < l : continue
+            if y > t or y < b : continue
+            
+            self.stage_clear = True
 
     def change_FPS(self):
         if self.state in [Player.MOVE]:
@@ -331,28 +340,44 @@ class Player:
         return x - hw, y - hh, x + hw, y + hh
 
     def grab(self):
-        x, y = self.draw_pos
+        x,_ = self.draw_pos
         p_l,p_b,p_r,p_t = self.get_bb()
         for obj in gfw.world.objects_at(gfw.layer.object):
-            l,b,r,t = obj.get_bb()
-            o_x,o_y = obj.draw_pos
-            if x < l or x > r : return False
-            if p_t < b or p_b > t : return False
-            if p_t >= o_y and p_b < o_y:
+            crash = collision.collide(self,obj)
+            if crash == True:
                 self.grab_item = obj
                 obj.grabed = True
                 return True
 
     def throw(self):
-        self.throwing = True
-        if self.look_left == True:
-            self.grab_item.change_dx(-3)
+        dx, dy = 0,0
+        
+        if self.crouch == 1:
+            if self.look_left == True:
+                dx -= 4
+            else:
+                dx += 4
+            dy += 5
+        elif self.crouch == -1:
+            if self.look_left == True:
+                dx -= 2
+            else:
+                dx += 2
+            dy += 0.2
         else:
-            self.grab_item.change_dx(3)
-        self.grab_item.change_dy(0.5)
-        self.grab_item.grabed = False
+            if self.look_left == True:
+                dx -= 4
+            else:
+                dx += 4
+            dy += 1
+            
+        self.grab_item.change_dx(dx)
+        self.grab_item.change_dy(dy)
+
         self.grab_item = None
         self.time = 0
+        self.fidx = 0
+        self.throwing = True
 
     def use(self):
         if self.grab_item is not None: 

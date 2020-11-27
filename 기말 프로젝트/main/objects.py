@@ -54,8 +54,7 @@ class Something:
 
         x,y = self.pos
         x += self.dx * self.speed * self.mag * gfw.delta_time
-        if self.grabed == False:
-            y += self.dy * self.speed * gfw.delta_time
+        y += self.dy * self.speed * gfw.delta_time
         
         dy = 0
         if tile is not None:
@@ -192,6 +191,7 @@ class Something:
                 dy = t - foot
                 self.dy = 0
                 self.dx = 0
+                self.grabed = False
                 # print('Now running', t, foot)
         return dy
 
@@ -268,6 +268,8 @@ class Arrow(Something):
             objectimage.clip_composite_draw(*self.rect,0,'h', *self.draw_pos, self.unit, self.unit)
 
     def collide(self):
+        if self.grabed == True:
+                return False
         if self.dx > 2 or self.dx < -2  : 
             self.dx = -self.dx // 2
             return True
