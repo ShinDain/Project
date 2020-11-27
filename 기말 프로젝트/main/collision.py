@@ -48,6 +48,7 @@ def collide_check_monster(player):
     for M in gfw.world.objects_at(gfw.layer.monster):
         crash = collide(M,player)
         if crash == False: continue
+        M.collide()
         player.dameged_just()
 
 def collide_check_object(player):

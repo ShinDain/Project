@@ -39,7 +39,7 @@ class Monster(Something):
     
         self.fidx = 0
         self.FPS = 12
-        self.state = Monster.ATTACK
+        self.state = Monster.IDLE
         self.look_left = False
 
         self.left_gab = 0
