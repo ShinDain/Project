@@ -35,6 +35,8 @@ class Something:
         self.mag = 2
         self.speed = 100
 
+        self.grabed = False
+
         self.unit = 80
         self.left_gab = 0
         self.bottom_gab = 0
@@ -52,7 +54,8 @@ class Something:
 
         x,y = self.pos
         x += self.dx * self.speed * self.mag * gfw.delta_time
-        y += self.dy * self.speed * gfw.delta_time
+        if self.grabed == False:
+            y += self.dy * self.speed * gfw.delta_time
         
         dy = 0
         if tile is not None:
@@ -84,6 +87,9 @@ class Something:
         x = x - self.left_gab
         y = y - self.bottom_gab
         self.draw_pos = x,y
+
+    def set_pos(self, pos):
+        self.pos = pos
 
     def get_bb(self):
         hw = 32
@@ -248,6 +254,8 @@ class Arrow(Something):
         self.left_gab = 0
         self.bottom_gab = 0
 
+        self.grabed = False
+
         self.look_left = look
         self.remove_time = 0
 
@@ -304,6 +312,8 @@ class Money(Something):
         self.left_gab = 0
         self.bottom_gab = 0
 
+        self.grabed = False
+
         self.score = score
 
         self.already = False
@@ -344,7 +354,7 @@ class Money(Something):
             self.change_dx(1) 
             self.change_dy(1)
 
-        self.collide_sound.play()
+        #self.collide_sound.play()
         self.time = 0
 
     def get_bb(self):

@@ -37,7 +37,7 @@ def enter():
     black_pos = 0, get_canvas_height() + 600
 
     main_bgm = load_music('res/stage_bgm.mp3')
-    main_bgm.set_volume(20)
+    main_bgm.set_volume(10)
     main_bgm.repeat_play()
 
     box = objects.Something(player.pos, 'treasure_box')

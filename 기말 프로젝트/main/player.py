@@ -96,7 +96,7 @@ class Player:
         self.dameged_time = 0
         self.stun = False
 
-        self.grap_item = None
+        self.grab_item = None
 
         self.wall_grab = False
         self.attack = False
@@ -177,6 +177,17 @@ class Player:
         self.pos = x,y
         self.time += gfw.delta_time
         self.dameged_time -= gfw.delta_time
+
+        if self.grab_item is not None:
+            tmpx,tmpy = self.pos
+            if self.look_left == True:
+                self.grab_item.look_left = True
+                tmpx -= 20
+            else:
+                self.grab_item.look_left = False
+                tmpx += 20
+            pos = tmpx, tmpy
+            self.grab_item.set_pos(pos)
 
         self.state_check()
 
@@ -319,24 +330,41 @@ class Player:
         x,y = self.draw_pos
         return x - hw, y - hh, x + hw, y + hh
 
-    def grab():
-        pass
+    def grab(self):
+        x, y = self.draw_pos
+        p_l,p_b,p_r,p_t = self.get_bb()
+        for obj in gfw.world.objects_at(gfw.layer.object):
+            l,b,r,t = obj.get_bb()
+            o_x,o_y = obj.draw_pos
+            if x < l or x > r : return False
+            if p_t < b or p_b > t : return False
+            if p_t >= o_y and p_b < o_y:
+                self.grab_item = obj
+                obj.grabed = True
+                return True
 
-    def throw():
+    def throw(self):
         self.throwing = True
         if self.look_left == True:
-            self.grap_item.change_dx(-3)
+            self.grab_item.change_dx(-3)
         else:
-            self.grap_item.change_dx(3)
-        self.grap_item.change_dy(0.5)
-        self.grap_item = None
+            self.grab_item.change_dx(3)
+        self.grab_item.change_dy(0.5)
+        self.grab_item.grabed = False
+        self.grab_item = None
         self.time = 0
 
     def use(self):
-        if self.attack == True : return
-        if self.grap_item is not None: 
+        if self.grab_item is not None: 
             self.throw()
             return
+
+        some = False
+        if self.crouch == -1:
+            some = self.grab()
+        if some == True: return
+        if self.attack == True : return
+        
         self.time = 0
         self.fidx = 0
         self.attack = True
