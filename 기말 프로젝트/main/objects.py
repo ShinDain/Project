@@ -447,8 +447,6 @@ class Bomb(Something):
         else:
             self.change_dx(1) 
             self.change_dy(1)
-
-        self.collide_sound.play()
         self.time = 0
 
     def collide_bomb(self):
