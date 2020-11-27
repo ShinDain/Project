@@ -70,6 +70,8 @@ class Player:
         self.land_sound = load_wav('res/wav/land.wav')
         self.death_sound = load_wav('res/wav/death.wav')
         self.spike_sound = load_wav('res/wav/spike_hit.wav')
+        self.throw_sound = load_wav('res/wav/throw_item.wav')
+        self.grab_sound = load_wav('res/wav/pickup.wav')
 
         self.set_volume()
 
@@ -323,6 +325,8 @@ class Player:
         self.jump_sound.set_volume(15)
         self.land_sound.set_volume(15)
         self.spike_sound.set_volume(20)
+        self.throw_sound.set_volume(15)
+        self.grab_sound.set_volume(15)
 
     def set_draw_pos(self, pos):
         self.draw_pos = pos
@@ -347,6 +351,7 @@ class Player:
             if crash == True:
                 self.grab_item = obj
                 obj.grabed = True
+                self.grab_sound.play()
                 return True
 
     def throw(self):
@@ -378,6 +383,7 @@ class Player:
         self.time = 0
         self.fidx = 0
         self.throwing = True
+        self.throw_sound.play()
 
     def use(self):
         if self.grab_item is not None: 

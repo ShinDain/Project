@@ -14,7 +14,7 @@ canvas_width = 1000
 canvas_height = 800
 
 def enter():
-    gfw.world.init(['bg','tile','object','score_object','monster', 'whip','player','ui'])
+    gfw.world.init(['bg','tile','object','score_object','monster', 'whip','player','effect','ui'])
     global player, bg, player_ui, main_bgm, black_canvas, black_pos
     
     bg = HorzScrollBackground('Background.png')
@@ -40,7 +40,7 @@ def enter():
     main_bgm.set_volume(10)
     main_bgm.repeat_play()
 
-    box = objects.Something(player.pos, 'treasure_box')
+    box = objects.Bomb(player.pos, 'boom1')
     gfw.world.add(gfw.layer.object,box)
 
     global fade_in_sound, fade_out_sound
@@ -64,6 +64,9 @@ def update():
         for obj in gfw.world.objects_at(layer):
             obj.left_gab = left_gab
             obj.bottom_gab = bottom_gab
+    for obj in gfw.world.objects_at(gfw.layer.effect):
+        obj.left_gab = left_gab
+        obj.bottom_gab = bottom_gab
 
     p_x, p_y = player.draw_pos
     for i in gfw.world.objects_at(gfw.layer.whip):

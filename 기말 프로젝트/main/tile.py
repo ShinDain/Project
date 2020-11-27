@@ -10,6 +10,8 @@ exitimage = None
 
 tile_rects = {}
 
+BLOCK_SIZE = 64
+
 def load():
     global tilesetimage, entranceimage, exitimage
     if tilesetimage is None:
@@ -30,7 +32,7 @@ class tile:
         self.bottom = bottom
         self.left_gab = 0
         self.bottom_gab = 0
-        self.unit = 64
+        self.unit = BLOCK_SIZE
         self.name = name
         self.rect = tile_rects[name]
     def update(self): pass
@@ -48,9 +50,10 @@ class tile:
         return self.left - self.left_gab, self.bottom - self.bottom_gab, self.left + self.unit - self.left_gab, self.bottom + self.unit - self.bottom_gab
     def move(self, dx, dy):
         self.left += dx
-    @property
+
     def remove(self):
         gfw.world.remove(self)
+
     def right(self):
         return self.left + self.unit
 
@@ -64,7 +67,7 @@ class arrow_trap(tile):
         self.bottom = bottom
         self.left_gab = 0
         self.bottom_gab = 0
-        self.unit = 64
+        self.unit = BLOCK_SIZE
         self.name = name
         self.rect = tile_rects[name]
 
