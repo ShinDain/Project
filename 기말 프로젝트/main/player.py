@@ -215,6 +215,9 @@ class Player:
             frame = self.time * self.FPS
             self.fidx = int(frame) % len(self.anim)
 
+        if self.grab_item != None:
+            self.grab_item.time = 0
+
         self.change_FPS()
         self.change_speed()
         # self.player.pos = point_add(self.player.pos, self.player.delta)
@@ -234,6 +237,8 @@ class Player:
                 self.dameged_just()
             elif e.key == SDLK_k:
                 self.dameged_to_stun()
+            elif e.key == SDLK_a:
+                self.use_rope()
             elif e.key == SDLK_s:
                 self.use_bomb()
 
@@ -382,36 +387,27 @@ class Player:
     def use_rope(self):
         if self.rope_count == 0: return
         self.rope_count -= 1
-        bomb = objects.Bomb(self.pos)
-        gfw.world.add(gfw.layer.object,bomb)
-        dx, dy = 0,0
         
-        if self.crouch == 1:
-            if self.look_left == True:
-                dx -= 4
-            else:
-                dx += 4
-            dy += 5
-        elif self.crouch == -1:
-            if self.look_left == True:
-                dx -= 2
-            else:
-                dx += 2
-            dy += 0.2
-        else:
-            if self.look_left == True:
-                dx -= 4
-            else:
-                dx += 4
-            dy += 1
-            
-        bomb.change_dx(dx)
-        bomb.change_dy(dy)
+        x,y = self.pos
+        x = (x // 64) * 64 + 32
+        y = (y // 64) * 64 + 32
+        dy = 0
 
-        self.time = 0
-        self.fidx = 0
-        self.throwing = True
-        self.throw_sound.play()
+        if self.crouch == -1:
+            if self.look_left == True:
+                x -= 64
+            else:
+                x += 64
+            dy += 0
+        else:
+            y += 64
+            dy += 7
+
+        pos = x,y
+        rope = objects.Rope(pos)
+
+        rope.change_dy(dy)
+        gfw.world.add(gfw.layer.object,rope)
 
     def grab(self):
         x,_ = self.draw_pos
@@ -420,7 +416,6 @@ class Player:
             crash = collision.collide(self,obj)
             if crash == True:
                 self.grab_item = obj
-                obj.grabed = True
                 self.grab_sound.play()
                 return True
 
@@ -543,7 +538,7 @@ class Player:
         x,y = self.draw_pos
         _,P_bottom,_,P_top = self.get_bb()
         for tile in gfw.world.objects_at(gfw.layer.tile):
-            if tile.name is not 'ledder_top' and tile.name is not 'ledder_bottom': continue
+            if tile.name in ['entrance', 'exit','cave_block', 'arrow_block', 'spike']: continue
             l,b,r,t = tile.get_bb()
             if x > r or x < l: continue
             if tile.name is 'ledder_top' and y > t and y < t + tile.unit and self.crouch == -1 : 
@@ -579,8 +574,7 @@ class Player:
         x, y = self.draw_pos
         _,_,_,P_top = self.get_bb()
         for tile in gfw.world.objects_at(gfw.layer.tile):
-            if tile.name in ['entrance', 'exit']: continue
-            if tile.name == 'ledder_bottom' or tile.name == 'ledder_top': continue
+            if tile.name in ['entrance', 'exit','ledder_bottom','ledder_top', 'rope_top', 'rope_mid', 'rope_last']: continue
             l,b,r,t = tile.get_bb()
             if x > r + 10 or x < l - 10: continue
             gab = (b + t) // 2
@@ -598,8 +592,7 @@ class Player:
         sel_top = 0
         x,y = self.draw_pos
         for tile in gfw.world.objects_at(gfw.layer.tile):
-            if tile.name == 'ledder_bottom': continue
-            if tile.name in ['entrance', 'exit']: continue
+            if tile.name in ['entrance', 'exit','ledder_bottom', 'rope_top', 'rope_mid', 'rope_last']: continue
             if tile.name == 'ledder_top' and self.rope_on is True: continue
             l,b,r,t = tile.get_bb()
             if x < l - 10 or x > r + 10: continue
@@ -644,8 +637,7 @@ class Player:
         selected = None
         _,y = self.draw_pos
         for tile in gfw.world.objects_at(gfw.layer.tile):
-            if tile.name in ['entrance', 'exit','spike']: continue
-            if tile.name == 'ledder_bottom' or tile.name == 'ledder_top': continue
+            if tile.name in ['entrance', 'exit','ledder_bottom','ledder_top', 'spike', 'rope_top', 'rope_mid', 'rope_last']: continue
             l,b,r,t = tile.get_bb()
             if y > t or y < b: continue
             if right < l or left > r: continue

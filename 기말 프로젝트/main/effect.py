@@ -93,7 +93,7 @@ class Blood:
 
         self.dx = random.uniform(-2,2)
         self.dy = random.uniform(2,4)
-        self.size = 30
+        self.size = 32
 
         self.time = 0
 
@@ -134,5 +134,5 @@ class Blood:
         self.draw_pos = x,y
 
     def get_bb(self):
-        x,y = self.pos
+        x,y = self.draw_pos
         return x - 3, y - 3, x + 3, y + 3

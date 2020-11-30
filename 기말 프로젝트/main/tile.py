@@ -14,13 +14,16 @@ tile_rects = {}
 BLOCK_SIZE = 64
 
 def load():
-    global tilesetimage, entranceimage, exitimage
+    global tilesetimage, entranceimage, exitimage, objectimage
     if tilesetimage is None:
         tilesetimage = gfw.image.load(gobj.res('tileset.png'))
         with open(gobj.res('all_tile.json')) as f:
             data = json.load(f)
             for name in data:
                 tile_rects[name] = tuple(data[name])
+    if objectimage is None:
+        objectimage = gfw.image.load(gobj.res('object.png'))
+
     if entranceimage is None:
         entranceimage = gfw.image.load(gobj.res('entrance.png'))
     if exitimage is None:
@@ -28,7 +31,6 @@ def load():
     
 class tile:
     def __init__(self, name, left, bottom):
-        load()
         self.left = left
         self.bottom = bottom
         self.unit = BLOCK_SIZE
@@ -43,7 +45,8 @@ class tile:
 
         tilesetimage.clip_draw_to_origin(*self.rect, left, bottom, self.unit, self.unit)
     def get_bb(self):
-        return self.left - objects.LEFT_GAB, self.bottom - objects.BOTTOM_GAB, self.left + self.unit - objects.LEFT_GAB, self.bottom + self.unit - objects.BOTTOM_GAB
+        return self.left - objects.LEFT_GAB, self.bottom - objects.BOTTOM_GAB,\
+         self.left + self.unit - objects.LEFT_GAB, self.bottom + self.unit - objects.BOTTOM_GAB
     def move(self, dx, dy):
         self.left += dx
 
@@ -128,3 +131,26 @@ class arrow_trap(tile):
         else:
             return self.left + self.unit - objects.LEFT_GAB, self.bottom - objects.BOTTOM_GAB + 20,\
             self.left + self.unit * 5 - objects.LEFT_GAB,self.bottom + self.unit - objects.BOTTOM_GAB - 20
+
+class Rope_top(tile):
+    def draw(self):
+        left = self.left - objects.LEFT_GAB
+        bottom = self.bottom - objects.BOTTOM_GAB
+        if left < -64 or left > get_canvas_width() + 64: return
+        if bottom < -64 or bottom > get_canvas_height() + 64: return
+
+        objectimage.clip_draw_to_origin(*self.rect, left, bottom, self.unit, self.unit)
+
+class Rope_mid(Rope_top):
+    pass
+class Rope_last(Rope_top):
+    pass
+
+class Rope_maker(tile):
+    def __init__(self, name, left, bottom):
+        self.left = left
+        self.bottom = bottom
+        self.unit = BLOCK_SIZE
+        self.name = name
+        self.rect = tile_rects[name]
+    def update(self): pass

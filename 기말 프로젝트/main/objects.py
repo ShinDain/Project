@@ -3,11 +3,12 @@ from pico2d import *
 import gfw
 import gobj
 import effect
+import tile
 
 LEFT_GAB = 0
 BOTTOM_GAB = 0
 
-GRAVITY = 5
+GRAVITY = 9
 
 objectimage = None
 object_rects = {}
@@ -71,6 +72,10 @@ class Something:
         self.pos = x,y
         self.set_draw_pos()
         self.time += gfw.delta_time
+        if self.time > 1:
+            self.grabed = False
+        else:
+            self.grabed = True
         if self.remove_b == True:
             self.remove_time -= gfw.delta_time
         if self.remove_time < 0:
@@ -141,7 +146,7 @@ class Something:
         _,foot,_,_ = self.get_bb()
         x,y = self.draw_pos
         for tile in gfw.world.objects_at(gfw.layer.tile):
-            if tile.name in ['entrance', 'exit','ledder_bottom','ledder_top']: continue
+            if tile.name in ['entrance', 'exit','ledder_bottom','ledder_top', 'rope_top', 'rope_mid', 'rope_last']: continue
             l,b,r,t = tile.get_bb()
             if x < l - 10 or x > r + 10: continue
             gab = (b + t) // 2 + 20
@@ -169,7 +174,6 @@ class Something:
                 dy = t - foot
                 self.dy = 0
                 self.dx = 0
-                self.grabed = False
                 # print('Now running', t, foot)
         return dy
 
@@ -178,7 +182,7 @@ class Something:
         _,y = self.draw_pos
         left,_,right,_ = self.get_bb()
         for tile in gfw.world.objects_at(gfw.layer.tile):
-            if tile.name in ['entrance', 'exit','ledder_bottom','ledder_top']: continue
+            if tile.name in ['entrance', 'exit','ledder_bottom','ledder_top', 'rope_top', 'rope_mid', 'rope_last']: continue
             l,b,r,t = tile.get_bb()
             if y > t or y < b: continue
             if right < l or left > r: continue
@@ -202,7 +206,7 @@ class Something:
         x, y = self.draw_pos
         _,_,_,P_top = self.get_bb()
         for tile in gfw.world.objects_at(gfw.layer.tile):
-            if tile.name in ['entrance', 'exit','ledder_bottom','ledder_top']: continue
+            if tile.name in ['entrance', 'exit','ledder_bottom','ledder_top', 'rope_top', 'rope_mid', 'rope_last']: continue
             l,b,r,t = tile.get_bb()
             if x > r + 10 or x < l - 10: continue
             gab = (b + t) // 2
@@ -275,7 +279,7 @@ class Arrow(Something):
     def collide(self):
         if self.grabed == True:
             return False
-        if self.dx > 2 or self.dx < -2  : 
+        if self.dx > 2 or self.dx < -2: 
             self.dx = -self.dx // 2
             return True
         else:
@@ -297,85 +301,6 @@ class Arrow(Something):
     def get_bb(self):
         x,y = self.draw_pos
         return x - 30, y - 12, x + 30, y + 5
-
-class Bomb(Something):
-    def init(self):
-        self.name = 'boom1'
-        self.rect = object_rects[self.name]
-        self.timer_sound = load_wav('res/wav/bomb_timer.wav')
-        self.explosion_sound1 = load_wav('res/wav/kaboom.wav')
-        self.explosion_sound2 = load_wav('res/wav/kaboombass.wav')
-
-    def update(self):
-        tile = self.get_tile()
-        wall = self.get_wall()
-
-        x,y = self.pos
-        x += self.dx * self.speed * self.mag * gfw.delta_time
-        y += self.dy * self.speed * gfw.delta_time
-        
-        dy = 0
-        if tile is not None:
-            dy = self.tile_check(tile)
-            y += dy
-        else: 
-            self.dy -= GRAVITY * gfw.delta_time   # 중력 적용
-
-        self.wall_check(wall)
-        self.get_floor()
-
-        x = clamp(20, x,FULL_MAP_WIDTH - 20)
-        y = clamp(0, y,FULL_MAP_HEIGHT)
-
-        self.pos = x,y
-        self.set_draw_pos()
-        self.time += gfw.delta_time
-        
-        self.remove_time -= gfw.delta_time
-
-        if self.remove_time < 0:
-            self.explosion()
-        elif self.remove_time < 2.5:
-            if self.rect != object_rects['boom2']:
-                self.rect = object_rects['boom2']
-            else:
-                self.rect = object_rects['boom3']
-
-    def draw(self):
-        x, y = self.draw_pos
-        if x < -64 or x > get_canvas_width() + 64: return
-        if y < -64 or y > get_canvas_height() + 64: return
-        objectimage.clip_draw(*self.rect, *self.draw_pos, self.unit, self.unit)
-
-    def collide(self):
-        pass
-
-    def collide_whip(self, pos):
-        o_x, o_y = self.pos
-        p_x, p_y = pos
-        if o_x < p_x:
-            self.change_dx(-1)
-            self.change_dy(1)
-        else:
-            self.change_dx(1) 
-            self.change_dy(1)
-        self.time = 0
-
-    def collide_bomb(self):
-        self.explosion()
-
-    def get_bb(self):
-        x,y = self.draw_pos
-        return x - 15, y - 20, x + 15, y + 10
-
-    def explosion(self):
-        boom_effect = effect.Explosion_effect(self.pos)
-        gfw.world.add(gfw.layer.effect, boom_effect)
-        boom_effect.explosion_sound1.set_volume(20)
-        boom_effect.explosion_sound2.set_volume(20)
-        boom_effect.explosion_sound1.play()
-        boom_effect.explosion_sound2.play()
-        self.remove()
 
 class Money(Something):
     def init(self):
@@ -416,11 +341,11 @@ class Money(Something):
 
     def get_bb(self):
         x,y = self.draw_pos
-        return x - 15, y - 24, x + 15, y + 10
+        return x - 15, y - 10, x + 15, y + 10
 
 class Gold_top(Money):
     def init(self):
-        self.name = 'golad_top'
+        self.name = 'gold_top'
         self.rect = object_rects[self.name]
         self.collide_sound = load_wav('res/wav/chime3.wav')
         self.already = False
@@ -524,3 +449,121 @@ class Stone(Arrow):
         x,y = self.draw_pos
         return x - 10, y - 10, x + 10, y + 10
 
+class Bomb(Something):
+    def init(self):
+        self.name = 'boom1'
+        self.rect = object_rects[self.name]
+        self.timer_sound = load_wav('res/wav/bomb_timer.wav')
+        self.explosion_sound1 = load_wav('res/wav/kaboom.wav')
+        self.explosion_sound2 = load_wav('res/wav/kaboombass.wav')
+
+    def update(self):
+        tile = self.get_tile()
+        wall = self.get_wall()
+
+        x,y = self.pos
+        x += self.dx * self.speed * self.mag * gfw.delta_time
+        y += self.dy * self.speed * gfw.delta_time
+        
+        dy = 0
+        if tile is not None:
+            dy = self.tile_check(tile)
+            y += dy
+        else: 
+            self.dy -= GRAVITY * gfw.delta_time   # 중력 적용
+
+        self.wall_check(wall)
+        self.get_floor()
+
+        x = clamp(20, x,FULL_MAP_WIDTH - 20)
+        y = clamp(0, y,FULL_MAP_HEIGHT)
+
+        self.pos = x,y
+        self.set_draw_pos()
+        self.time += gfw.delta_time
+        
+        self.remove_time -= gfw.delta_time
+
+        if self.remove_time < 0:
+            self.explosion()
+        elif self.remove_time < 2.5:
+            if self.rect != object_rects['boom2']:
+                self.rect = object_rects['boom2']
+            else:
+                self.rect = object_rects['boom3']
+
+    def draw(self):
+        x, y = self.draw_pos
+        if x < -64 or x > get_canvas_width() + 64: return
+        if y < -64 or y > get_canvas_height() + 64: return
+        objectimage.clip_draw(*self.rect, *self.draw_pos, self.unit, self.unit)
+
+    def collide(self):
+        pass
+
+    def collide_whip(self, pos):
+        o_x, o_y = self.pos
+        p_x, p_y = pos
+        if o_x < p_x:
+            self.change_dx(-1)
+            self.change_dy(1)
+        else:
+            self.change_dx(1) 
+            self.change_dy(1)
+        self.time = 0
+
+    def collide_bomb(self):
+        self.explosion()
+
+    def get_bb(self):
+        x,y = self.draw_pos
+        return x - 15, y - 20, x + 15, y + 10
+
+    def explosion(self):
+        boom_effect = effect.Explosion_effect(self.pos)
+        gfw.world.add(gfw.layer.effect, boom_effect)
+        boom_effect.explosion_sound1.set_volume(20)
+        boom_effect.explosion_sound2.set_volume(20)
+        boom_effect.explosion_sound1.play()
+        boom_effect.explosion_sound2.play()
+        self.remove()
+
+class Rope(Something):
+    def init(self):
+        self.name = 'rope_object'
+        self.rect = object_rects[self.name]
+
+    def update(self):
+        x,y = self.pos
+        x += self.dx * self.speed * self.mag * gfw.delta_time
+        y += self.dy * self.speed * gfw.delta_time
+        
+        self.dy -= GRAVITY * gfw.delta_time   # 중력 적용
+
+        self.get_floor()
+
+        x = clamp(20, x,FULL_MAP_WIDTH - 20)
+        y = clamp(0, y,FULL_MAP_HEIGHT)
+
+        self.make_rope()
+
+        self.pos = x,y
+        self.set_draw_pos()
+        self.time += gfw.delta_time
+
+    def make_rope(self):
+        x,y = self.pos
+        x -= 32
+        y -= 32
+        if self.dy <= 0:
+            rope1 = tile.Rope_top('rope_top', x, y)
+            rope2 = tile.Rope_mid('rope_mid', x, y - tile.BLOCK_SIZE)
+            rope3 = tile.Rope_mid('rope_mid', x, y - tile.BLOCK_SIZE * 2)
+            rope4 = tile.Rope_mid('rope_mid', x, y - tile.BLOCK_SIZE * 3)
+            rope5 = tile.Rope_last('rope_last', x, y - tile.BLOCK_SIZE * 4)
+            gfw.world.add(gfw.layer.tile, rope1)
+            gfw.world.add(gfw.layer.tile, rope2)
+            gfw.world.add(gfw.layer.tile, rope3)
+            gfw.world.add(gfw.layer.tile, rope4)
+            gfw.world.add(gfw.layer.tile, rope5)
+            self.remove()

@@ -9,6 +9,7 @@ import objects
 import effect
 import collision
 import monster
+import tile
 import ui
 
 canvas_width = 1000
@@ -24,6 +25,7 @@ def enter():
     ui.load()
     objects.load()
     monster.load()
+    tile.load()
     camera.camera_init()
 
     (e_x,e_y), (o_x,o_y) = all_stage_gen.make_all_map()
@@ -42,10 +44,6 @@ def enter():
     main_bgm = load_music('res/stage_bgm.mp3')
     main_bgm.set_volume(10)
     main_bgm.repeat_play()
-
-    tmpx, tmpy = player.pos
-    snake = monster.Monster((tmpx + 160, tmpy), 'snake')
-    gfw.world.add(gfw.layer.monster,snake)
 
     global fade_in_sound, fade_out_sound
     fade_in_sound = load_wav('res/wav/fadein.wav')
@@ -87,27 +85,10 @@ def update():
 
     fade_in_out()
 
-def fade_in_out():
-    global black_canvas, black_pos
-    b_x, b_y = black_pos
-    if player.stage_clear == True:
-        if b_y > 0:
-            b_y -= 10
-        else:
-            fade_out_sound.play()
-            reset()
-    elif player.death_time < 8:
-        if b_y > 0:
-            b_y -= 4
-    else:
-        if b_y < get_canvas_height():
-            b_y += 10
-    black_pos = b_x, b_y
-
 def draw():
     global black_canvas
     gfw.world.draw()
-    gobj.draw_collision_box()
+    #gobj.draw_collision_box()
     black_canvas.draw_to_origin(*black_pos,get_canvas_width(), get_canvas_height())
 
 def handle_event(e):
@@ -139,6 +120,23 @@ def reset():
     player.init((e_x + 32,e_y + 32))
 
     clear_in_out(e_x,e_y,o_x,o_y)
+
+def fade_in_out():
+    global black_canvas, black_pos
+    b_x, b_y = black_pos
+    if player.stage_clear == True:
+        if b_y > 0:
+            b_y -= 10
+        else:
+            fade_out_sound.play()
+            reset()
+    elif player.death_time < 8:
+        if b_y > 0:
+            b_y -= 4
+    else:
+        if b_y < get_canvas_height():
+            b_y += 10
+    black_pos = b_x, b_y
 
 def clear_in_out(x1,y1,x2,y2):
     for t in gfw.world.objects_at(gfw.layer.tile):
