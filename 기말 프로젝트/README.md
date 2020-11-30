@@ -84,6 +84,8 @@
 
 ## 7. 11-23 기준 완성도
 ![Sheet](/img/11_23.PNG)
+![Sheet](/img/capture.PNG)
+![Sheet](/img/boom_capture.PNG)
 
 ## 8. class 구성
  1. 플레이어
