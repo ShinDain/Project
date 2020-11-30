@@ -3,7 +3,7 @@ from pico2d import *
 import gfw
 import gobj
 import tile
-from objects import Something
+import objects
 
 GRAVITY = 5
 
@@ -17,7 +17,7 @@ def load():
     if monsterimage is None:
         monsterimage = gfw.image.load(gobj.res('monster.png'))
 
-class Monster(Something):
+class Monster(objects.Something):
     Animation = [
     [0xB0], # 기본
     [0xB0,0xB1,0xB2,0xB3,0xB4,0xB5,0xB6,0xB7,0xB8,0xB9,0xBA], # 이동 
@@ -45,9 +45,6 @@ class Monster(Something):
         self.FPS = 12
         self.state = Monster.IDLE
         self.look_left = False
-
-        self.left_gab = 0
-        self.bottom_gab = 0
 
     @property
     def state(self):
@@ -97,7 +94,6 @@ class Monster(Something):
         x, y = self.draw_pos
         if x < -64 or x > get_canvas_width() + 64: return
         if y < -64 or y > get_canvas_height() + 64: return
-        
         
         sprite_num = self.anim[self.fidx]
 

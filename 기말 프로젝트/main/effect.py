@@ -2,8 +2,12 @@ import random
 from pico2d import *
 import gfw
 import gobj
-import tile
-import collision
+from collision import collide
+
+LEFT_GAB = 0
+BOTTOM_GAB = 0
+
+BLOCK_SIZE = 64
 
 class Explosion_effect:
     def __init__(self, pos):
@@ -17,9 +21,6 @@ class Explosion_effect:
         self.fidx = 0
         self.fidy = 0
         self.unit = 240
-
-        self.left_gab = 0
-        self.bottom_gab = 0
 
         self.explosion_sound1 = load_wav('res/wav/kaboom.wav')
         self.explosion_sound2 = load_wav('res/wav/kaboombass.wav')
@@ -44,28 +45,28 @@ class Explosion_effect:
         crash = False
         for t in gfw.world.objects_at(gfw.layer.tile):
             if t.name in ['exit', 'entrance','cant_break']:continue
-            crash = collision.collide(t,self)
+            crash = collide(t,self)
             if crash == True:
                 t.remove()
         for obj in gfw.world.objects_at(gfw.layer.object):
             if obj == self : continue
-            crash = collision.collide(obj,self)
+            crash = collide(obj,self)
             if crash == True:
                 obj.collide_bomb()
         for m in gfw.world.objects_at(gfw.layer.monster):
             if m == self : continue
-            crash = collision.collide(m,self)
+            crash = collide(m,self)
             if crash == True:
                 m.collide_whip((0,0))
         for p in gfw.world.objects_at(gfw.layer.player):
-            p_crash = collision.collide(p, self)
+            p_crash = collide(p, self)
             if p_crash == True:
                 p.dameged_to_die()
 
     def set_draw_pos(self):
         x, y = self.pos
-        x = x - self.left_gab
-        y = y - self.bottom_gab
+        x = x - LEFT_GAB
+        y = y - BOTTOM_GAB
         self.draw_pos = x,y
 
     def remove(self):
@@ -76,4 +77,4 @@ class Explosion_effect:
             return 0,0,0,0
 
         x,y = self.draw_pos
-        return x - tile.BLOCK_SIZE * 1.5, y - tile.BLOCK_SIZE * 1.5, x + tile.BLOCK_SIZE * 1.5, y + tile.BLOCK_SIZE * 1.5
+        return x - BLOCK_SIZE * 1.5, y - BLOCK_SIZE * 1.5, x + BLOCK_SIZE * 1.5, y + BLOCK_SIZE * 1.5

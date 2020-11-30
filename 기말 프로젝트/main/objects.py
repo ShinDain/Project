@@ -2,9 +2,10 @@ import random
 from pico2d import *
 import gfw
 import gobj
-import tile
-import collision
 import effect
+
+LEFT_GAB = 0
+BOTTOM_GAB = 0
 
 GRAVITY = 5
 
@@ -24,14 +25,11 @@ def load():
                 object_rects[name] = tuple(data[name])
 
 class Something:
-    def __init__(self,pos,name):
+    def __init__(self,pos):
         self.pos = pos
         self.draw_pos = self.pos
         self.dy = 0
         self.dx = 0
-
-        self.name = name
-        self.rect = object_rects[name]
 
         self.time = 0 
         self.mag = 2
@@ -40,18 +38,14 @@ class Something:
         self.grabed = False
 
         self.unit = 80
-        self.left_gab = 0
-        self.bottom_gab = 0
-
         self.remove_b = False
         self.remove_time = 1
+        self.init()
 
-        if name == 'box':
-            self.collide_sound = load_wav('res/wav/crateopen.wav')
-        elif name == 'treasure_box':
-            self.collide_sound = load_wav('res/wav/chestopen.wav')
-        elif name == 'stone':
-            self.collide_sound = load_wav('res/wav/item_drop.wav')
+    def init(self):
+        self.name = 'box'
+        self.rect = object_rects[self.name]
+        self.collide_sound = load_wav('res/wav/crateopen.wav')
 
     def update(self):
         tile = self.get_tile()
@@ -91,8 +85,8 @@ class Something:
 
     def set_draw_pos(self):
         x, y = self.pos
-        x = x - self.left_gab
-        y = y - self.bottom_gab
+        x = x - LEFT_GAB
+        y = y - BOTTOM_GAB
         self.draw_pos = x,y
 
     def set_pos(self, pos):
@@ -116,42 +110,14 @@ class Something:
             
         self.collide_sound.play()
 
-        if self.name == 'stone': return
-
         self.time = 0
         self.remove_b = True
 
-        if self.name == 'box':
-            select = random.choice(['boom_pack', 'rope_pack', 'stone'])
-            score = 0
-            if select == 'boom_pack':
-                score = 3
-                obj = Money(self.pos,select, score)
-                gfw.world.add(gfw.layer.score_object, obj)
-            elif select == 'rope_pack':
-                score = 3
-                obj = Money(self.pos,select, score)
-                gfw.world.add(gfw.layer.score_object, obj)
-            elif select == 'stone':
-                obj = Something(self.pos,select)
-                gfw.world.add(gfw.layer.object, obj)
-            
-        elif self.name == 'treasure_box':
-            select = random.choice(['gold_bar','gold_top','gem1','gem2','gem3','gem4'])
-            score = 0
-            if select == 'gold_bar':
-                score = 100
-            elif select == 'gold_top':
-                score = 300
-            elif select == 'gem1':
-                score = 1000
-            elif select == 'gem2':
-                score = 2000
-            elif select == 'gem3':
-                score = 3000
-            elif select == 'gem4':
-                score = 5000
-            obj = Money(self.pos,select, score)
+        select = random.choice([Bomb_pack, Rope_pack, Stone])
+        obj = select(self.pos)
+        if select == Stone:
+            gfw.world.add(gfw.layer.object, obj)
+        else:
             gfw.world.add(gfw.layer.score_object, obj)
             
     def collide(self):
@@ -175,9 +141,7 @@ class Something:
         _,foot,_,_ = self.get_bb()
         x,y = self.draw_pos
         for tile in gfw.world.objects_at(gfw.layer.tile):
-            if tile.name == 'ledder_bottom': continue
-            if tile.name in ['entrance', 'exit']: continue
-            if tile.name == 'ledder_top': continue
+            if tile.name in ['entrance', 'exit','ledder_bottom','ledder_top']: continue
             l,b,r,t = tile.get_bb()
             if x < l - 10 or x > r + 10: continue
             gab = (b + t) // 2 + 20
@@ -238,8 +202,7 @@ class Something:
         x, y = self.draw_pos
         _,_,_,P_top = self.get_bb()
         for tile in gfw.world.objects_at(gfw.layer.tile):
-            if tile.name in ['entrance', 'exit']: continue
-            if tile.name == 'ledder_bottom' or tile.name == 'ledder_top': continue
+            if tile.name in ['entrance', 'exit','ledder_bottom','ledder_top']: continue
             l,b,r,t = tile.get_bb()
             if x > r + 10 or x < l - 10: continue
             gab = (b + t) // 2
@@ -250,30 +213,53 @@ class Something:
                 if self.dy > 0:
                     self.dy = 0
 
+class Treasure_box(Something):
+    def init(self):
+        self.name = 'treasure_box'
+        self.rect = object_rects[self.name]
+        self.collide_sound = load_wav('res/wav/chestopen.wav')
+
+    def collide_whip(self, pos):
+        o_x, o_y = self.pos
+        p_x, p_y = pos
+        if o_x < p_x:
+            self.change_dx(-1)
+            self.change_dy(1)
+        else:
+            self.change_dx(1) 
+            self.change_dy(1)
+            
+        self.collide_sound.play()
+
+        self.time = 0
+        self.remove_b = True
+        select = random.choice([Money,Gold_top,Gem1,Gem2,Gem3,Gem4])
+        obj = select(self.pos)
+        gfw.world.add(gfw.layer.score_object, obj)
+
 class Arrow(Something):
-    def __init__(self,pos,name, look):
+    def __init__(self,pos, look):
         self.pos = pos
         self.draw_pos = self.pos
         self.dy = 0
         self.dx = 0
 
-        self.name = name
-        self.rect = (640,864,80,80)
-
         self.time = 0 
         self.mag = 2
         self.speed = 100
 
-        self.unit = 80
-        self.left_gab = 0
-        self.bottom_gab = 0
-
         self.grabed = False
 
+        self.unit = 80
         self.look_left = look
-        self.remove_b = False
-        self.remove_time = 0
 
+        self.remove_b = False
+        self.remove_time = 1
+        self.init()
+
+    def init(self):
+        self.name = 'arrow'
+        self.rect = object_rects[self.name]
         self.collide_sound = load_wav('res/wav/arrowhitwall.wav')
 
     def draw(self):
@@ -288,7 +274,7 @@ class Arrow(Something):
 
     def collide(self):
         if self.grabed == True:
-                return False
+            return False
         if self.dx > 2 or self.dx < -2  : 
             self.dx = -self.dx // 2
             return True
@@ -310,111 +296,12 @@ class Arrow(Something):
 
     def get_bb(self):
         x,y = self.draw_pos
-        if self.look_left == False:
-            return x - 30, y - 12, x + 30, y + 5
-        else:
-            return x - 30, y - 12, x + 30, y + 5
-
-class Money(Something):
-    def __init__(self,pos,name, score):
-        self.pos = pos
-        self.draw_pos = self.pos
-        self.dy = 0
-        self.dx = 0
-
-        self.name = name
-        self.rect = object_rects[name]
-
-        self.time = 0 
-        self.mag = 2
-        self.speed = 100
-
-        self.unit = 80
-        self.left_gab = 0
-        self.bottom_gab = 0
-
-        self.grabed = False
-
-        self.score = score
-
-        self.already = False
-        self.remove_b = False
-        self.remove_time = 1
-
-        if name == 'gold_bar':
-            self.collide_sound = load_wav('res/wav/chime.wav')
-        elif name == 'gold_top':
-            self.collide_sound = load_wav('res/wav/chime3.wav')
-        elif name == 'gem1':
-            self.collide_sound = load_wav('res/wav/gem1.wav')
-        elif name == 'gem2':
-            self.collide_sound = load_wav('res/wav/gem2.wav')
-        elif name == 'gem3':
-            self.collide_sound = load_wav('res/wav/gem3.wav')
-        elif name == 'gem4':
-            self.collide_sound = load_wav('res/wav/gem4.wav')
-        elif name == 'boom_pack' or name == 'rope_pack':
-            self.collide_sound = load_wav('res/wav/collect.wav')
-
-    def draw(self):
-        x, y = self.draw_pos
-        if x < -64 or x > get_canvas_width() + 64: return
-        if y < -64 or y > get_canvas_height() + 64: return
-
-        if self.already == True : return
-        x, y = self.pos
-        objectimage.clip_draw(*self.rect, *self.draw_pos, self.unit, self.unit)
-
-    def collide(self):
-        if self.already == True : return 0
-        self.remove_b = True
-        self.collide_sound.play()
-        self.already = True
-        return self.score
-
-    def collide_whip(self, pos):
-        o_x, o_y = self.pos
-        p_x, p_y = pos
-        if o_x < p_x:
-            self.change_dx(-1)
-            self.change_dy(1)
-        else:
-            self.change_dx(1) 
-            self.change_dy(1)
-
-        #self.collide_sound.play()
-        self.time = 0
-
-    def get_bb(self):
-        x,y = self.draw_pos
-        if self.name == 'gold_bar':
-            return x - 12, y - 10, x + 12, y + 8
-        elif self.name == 'gold_top':
-            return x - 25, y - 10, x + 25, y + 12
-        else:
-            return x - 15, y - 24, x + 15, y + 10
-
+        return x - 30, y - 12, x + 30, y + 5
 
 class Bomb(Something):
-    def __init__(self,pos,name):
-        self.pos = pos
-        self.draw_pos = self.pos
-        self.dy = 0
-        self.dx = 0
-
-        self.name = name
-        self.rect = object_rects[name]
-
-        self.time = 0 
-        self.mag = 2
-        self.speed = 100
-
-        self.unit = 80
-        self.left_gab = 0
-        self.bottom_gab = 0
-
-        self.remove_time = 3
-
+    def init(self):
+        self.name = 'boom1'
+        self.rect = object_rects[self.name]
         self.timer_sound = load_wav('res/wav/bomb_timer.wav')
         self.explosion_sound1 = load_wav('res/wav/kaboom.wav')
         self.explosion_sound2 = load_wav('res/wav/kaboombass.wav')
@@ -449,12 +336,10 @@ class Bomb(Something):
         if self.remove_time < 0:
             self.explosion()
         elif self.remove_time < 2.5:
-            if self.name != 'boom2':
-                self.name = 'boom2' 
+            if self.rect != object_rects['boom2']:
+                self.rect = object_rects['boom2']
             else:
-                self.name = 'boom3'
-                
-        self.rect = object_rects[self.name]
+                self.rect = object_rects['boom3']
 
     def draw(self):
         x, y = self.draw_pos
@@ -491,3 +376,151 @@ class Bomb(Something):
         boom_effect.explosion_sound1.play()
         boom_effect.explosion_sound2.play()
         self.remove()
+
+class Money(Something):
+    def init(self):
+        self.name = 'gold_bar'
+        self.rect = object_rects[self.name]
+        self.collide_sound = load_wav('res/wav/chime.wav')
+        self.already = False
+        self.score = 100
+
+    def draw(self):
+        x, y = self.draw_pos
+        if x < -64 or x > get_canvas_width() + 64: return
+        if y < -64 or y > get_canvas_height() + 64: return
+
+        if self.already == True : return
+        x, y = self.pos
+        objectimage.clip_draw(*self.rect, *self.draw_pos, self.unit, self.unit)
+
+    def collide(self):
+        if self.already == True : return 0
+        self.remove_b = True
+        self.collide_sound.play()
+        self.already = True
+        return self.score
+
+    def collide_whip(self, pos):
+        o_x, o_y = self.pos
+        p_x, p_y = pos
+        if o_x < p_x:
+            self.change_dx(-1)
+            self.change_dy(1)
+        else:
+            self.change_dx(1) 
+            self.change_dy(1)
+
+        #self.collide_sound.play()
+        self.time = 0
+
+    def get_bb(self):
+        x,y = self.draw_pos
+        return x - 15, y - 24, x + 15, y + 10
+
+class Gold_top(Money):
+    def init(self):
+        self.name = 'golad_top'
+        self.rect = object_rects[self.name]
+        self.collide_sound = load_wav('res/wav/chime3.wav')
+        self.already = False
+        self.score = 500
+
+    def get_bb(self):
+        x,y = self.draw_pos
+        return x - 25, y - 10, x + 25, y + 12
+
+class Gem1(Money):
+    def init(self):
+        self.name = 'gem1'
+        self.rect = object_rects[self.name]
+        self.collide_sound = load_wav('res/wav/gem1.wav')
+        self.already = False
+        self.score = 1000
+
+    def get_bb(self):
+        x,y = self.draw_pos
+        return x - 15, y - 24, x + 15, y + 10
+
+class Gem2(Gem1):
+    def init(self):
+        self.name = 'gem2'
+        self.rect = object_rects[self.name]
+        self.collide_sound = load_wav('res/wav/gem2.wav')
+        self.already = False
+        self.score = 2000
+
+class Gem3(Gem1):
+    def init(self):
+        self.name = 'gem3'
+        self.rect = object_rects[self.name]
+        self.collide_sound = load_wav('res/wav/gem3.wav')
+        self.already = False
+        self.score = 3000
+
+class Gem4(Gem1):
+    def init(self):
+        self.name = 'gem4'
+        self.rect = object_rects[self.name]
+        self.collide_sound = load_wav('res/wav/gem4.wav')
+        self.already = False
+        self.score = 5000
+
+class Bomb_pack(Gold_top):
+    def init(self):
+        self.name = 'bomb_pack'
+        self.rect = object_rects[self.name]
+        self.collide_sound = load_wav('res/wav/collect.wav')
+        self.already = False
+        self.score = 3
+
+    def get_bb(self):
+        x,y = self.draw_pos
+        return x - 15, y - 25, x + 15, y + 10
+
+class Rope_pack(Gold_top):
+    def init(self):
+        self.name = 'rope_pack'
+        self.rect = object_rects[self.name]
+        self.collide_sound = load_wav('res/wav/collect.wav')
+        self.already = False
+        self.score = 3
+
+    def get_bb(self):
+        x,y = self.draw_pos
+        return x - 15, y - 25, x + 15, y + 10
+
+class Stone(Arrow):
+    def __init__(self,pos):
+        self.pos = pos
+        self.draw_pos = self.pos
+        self.dy = 0
+        self.dx = 0
+
+        self.time = 0 
+        self.mag = 2
+        self.speed = 100
+
+        self.grabed = False
+
+        self.unit = 80
+        self.remove_b = False
+        self.remove_time = 1
+        self.init()
+
+    def init(self):
+        self.name = 'stone'
+        self.rect = object_rects[self.name]
+        self.collide_sound = load_wav('res/wav/item_drop.wav')
+
+    def draw(self):
+        x, y = self.draw_pos
+        if x < -64 or x > get_canvas_width() + 64: return
+        if y < -64 or y > get_canvas_height() + 64: return
+
+        objectimage.clip_draw(*self.rect, *self.draw_pos, self.unit, self.unit)
+
+    def get_bb(self):
+        x,y = self.draw_pos
+        return x - 10, y - 10, x + 10, y + 10
+

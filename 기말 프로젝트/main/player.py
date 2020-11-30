@@ -2,7 +2,6 @@ import random
 from pico2d import *
 import gfw
 import gobj
-import tile
 import whip
 import collision
 import objects
@@ -349,7 +348,7 @@ class Player:
     def use_bomb(self):
         if self.boom_count == 0: return
         self.boom_count -= 1
-        bomb = objects.Bomb(self.pos, 'boom1')
+        bomb = objects.Bomb(self.pos)
         gfw.world.add(gfw.layer.object,bomb)
         dx, dy = 0,0
         

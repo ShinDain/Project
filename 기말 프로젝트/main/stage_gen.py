@@ -7,7 +7,6 @@ import random
 import objects
 import monster
 
-
 UNIT_PER_LINE = 10
 SCREEN_LINES = 9
 BLOCK_SIZE = 64
@@ -85,36 +84,29 @@ def create_object(ch, x, y):
             x += BLOCK_SIZE
         elif ch[i] == 'S':
             remove_double(x,y)
-            obj = tile('spike', x, y)
+            obj = spike('spike', x, y)
             gfw.world.add(gfw.layer.tile, obj)
             x += BLOCK_SIZE
         elif ch[i] == '9':
-            obj = tile('entrance', x, y)
+            obj = entrance('entrance', x, y)
             gfw.world.add(gfw.layer.tile, obj)
             x += BLOCK_SIZE
         elif ch[i] == '8':
-            obj = tile('exit', x, y)
+            obj = exit('exit', x, y)
             gfw.world.add(gfw.layer.tile, obj)
             x += BLOCK_SIZE
         elif ch[i] == '-':
             global OBJECT_COUNT
             if OBJECT_COUNT < MAX_OBJECT_COUNT:
-                choice = random.choice([objects.Something, monster.Monster])
-                if choice == objects.Something:
-                    name = random.choice(['box', 'treasure_box'])
-                    pos = x + BLOCK_SIZE // 2, y + BLOCK_SIZE // 2
-                    obj = choice(pos, name)
-                    gfw.world.add(gfw.layer.object, obj)
-                else:
-                    name = random.choice(['snake', 'bat'])
-                    pos = x + BLOCK_SIZE // 2, y + BLOCK_SIZE // 2
-                    obj = choice(pos, name)
-                    gfw.world.add(gfw.layer.monster, obj)
+                choice = random.choice([ monster.Monster])
+                name = random.choice(['snake', 'bat'])
+                pos = x + BLOCK_SIZE // 2, y + BLOCK_SIZE // 2
+                obj = choice(pos, name)
+                gfw.world.add(gfw.layer.monster, obj)
                 OBJECT_COUNT += 1
             x += BLOCK_SIZE
         else:
             x += BLOCK_SIZE
-
 
 def get(x, y):
     col = x % UNIT_PER_LINE
@@ -122,17 +114,7 @@ def get(x, y):
     #print('lines[row] = ', lines[row])
     return lines[row]
 
-def test_gen_2():
-    open_canvas()
-    gfw.world.init(['tile'])
-    load(gobj.res('stages/stage_type0.txt'))
-
-    print('count=', count())
-
-    for i in range(100):
-        update()
-
-    close_canvas()
-
-if __name__ == '__main__':
-    test_gen_2()
+def dont_fall_tile():
+    for i in range(40):
+        tmp = tile('cant_break',i * BLOCK_SIZE, - BLOCK_SIZE)
+        gfw.world.add(gfw.layer.tile,tmp)

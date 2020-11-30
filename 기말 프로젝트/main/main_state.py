@@ -5,9 +5,9 @@ import gobj
 from background import HorzScrollBackground
 import all_stage_gen
 import camera
-import whip
 import objects
-import collision 
+import effect
+import collision
 import monster
 import ui
 
@@ -64,13 +64,11 @@ def update():
     p_draw_x, p_draw_y, left_gab, bottom_gab = camera.update(player)
 
     player.set_draw_pos((p_draw_x,p_draw_y))
-    for layer in range(gfw.layer.tile, gfw.layer.monster + 1):
-        for obj in gfw.world.objects_at(layer):
-            obj.left_gab = left_gab
-            obj.bottom_gab = bottom_gab
-    for obj in gfw.world.objects_at(gfw.layer.effect):
-        obj.left_gab = left_gab
-        obj.bottom_gab = bottom_gab
+
+    objects.LEFT_GAB = left_gab
+    objects.BOTTOM_GAB = bottom_gab
+    effect.LEFT_GAB = left_gab
+    effect.BOTTOM_GAB = bottom_gab
 
     p_x, p_y = player.draw_pos
     for i in gfw.world.objects_at(gfw.layer.whip):
@@ -101,7 +99,7 @@ def update():
 def draw():
     global black_canvas
     gfw.world.draw()
-    #gobj.draw_collision_box()
+    gobj.draw_collision_box()
     black_canvas.draw_to_origin(*black_pos,get_canvas_width(), get_canvas_height())
 
 def handle_event(e):
