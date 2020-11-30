@@ -94,6 +94,11 @@ class Monster(Something):
         self.fidx = int(frame) % len(self.anim)
             
     def draw(self):
+        x, y = self.draw_pos
+        if x < -64 or x > get_canvas_width() + 64: return
+        if y < -64 or y > get_canvas_height() + 64: return
+        
+        
         sprite_num = self.anim[self.fidx]
 
         sx, sy = sprite_num % 0x10, sprite_num // 0x10

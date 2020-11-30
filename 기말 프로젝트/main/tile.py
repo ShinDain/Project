@@ -37,12 +37,17 @@ class tile:
         self.rect = tile_rects[name]
     def update(self): pass
     def draw(self):
+        left = self.left - self.left_gab
+        bottom = self.bottom - self.bottom_gab
+        if left < -64 or left > get_canvas_width() + 64: return
+        if bottom < -64 or bottom > get_canvas_height() + 64: return
+        
         if self.name is 'entrance':
-            entranceimage.clip_draw_to_origin(*self.rect,self.left - self.left_gab, self.bottom - self.bottom_gab, self.unit, self.unit)
+            entranceimage.clip_draw_to_origin(*self.rect,left, bottom, self.unit, self.unit)
         elif self.name is 'exit':
-            exitimage.clip_draw_to_origin(*self.rect, self.left - self.left_gab, self.bottom - self.bottom_gab, self.unit, self.unit)
+            exitimage.clip_draw_to_origin(*self.rect, left, bottom, self.unit, self.unit)
         else:
-            tilesetimage.clip_draw_to_origin(*self.rect, self.left - self.left_gab, self.bottom - self.bottom_gab, self.unit, self.unit)
+            tilesetimage.clip_draw_to_origin(*self.rect, left, bottom, self.unit, self.unit)
     def get_bb(self):
         if self.name == 'spike':
             return self.left - self.left_gab, self.bottom - self.bottom_gab, self.left + self.unit - self.left_gab, self.bottom + self.unit//2 - self.bottom_gab
@@ -77,6 +82,11 @@ class arrow_trap(tile):
         self.arrow_shoot_sound = load_wav('res/wav/arrowshot.wav')
 
     def draw(self):
+        left = self.left - self.left_gab
+        bottom = self.bottom - self.bottom_gab
+        if left < -64 or left > get_canvas_width() + 64: return
+        if bottom < -64 or bottom > get_canvas_height() + 64: return
+        
         if self.look_left is False:
             tilesetimage.clip_draw_to_origin(*self.rect, self.left - self.left_gab, self.bottom - self.bottom_gab, self.unit, self.unit)
         else:

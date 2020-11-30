@@ -101,7 +101,7 @@ def update():
 def draw():
     global black_canvas
     gfw.world.draw()
-    gobj.draw_collision_box()
+    #gobj.draw_collision_box()
     black_canvas.draw_to_origin(*black_pos,get_canvas_width(), get_canvas_height())
 
 def handle_event(e):

@@ -68,7 +68,7 @@ def collide_check_score(player):
             score = obj.collide()
             if obj.name == 'boom_pack':
                 player.boom_count += score
-            elif obj.name == 'rope_count':
+            elif obj.name == 'rope_pack':
                 player.rope_count += score
             else:
                 player.increase_score(score)

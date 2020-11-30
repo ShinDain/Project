@@ -83,7 +83,10 @@ class Something:
             self.remove()
             
     def draw(self):
-        x, y = self.pos
+        x, y = self.draw_pos
+        if x < -64 or x > get_canvas_width() + 64: return
+        if y < -64 or y > get_canvas_height() + 64: return
+
         objectimage.clip_draw(*self.rect, *self.draw_pos, self.unit, self.unit)
 
     def set_draw_pos(self):
@@ -274,6 +277,10 @@ class Arrow(Something):
         self.collide_sound = load_wav('res/wav/arrowhitwall.wav')
 
     def draw(self):
+        x, y = self.draw_pos
+        if x < -64 or x > get_canvas_width() + 64: return
+        if y < -64 or y > get_canvas_height() + 64: return
+
         if self.look_left is False:
             objectimage.clip_draw(*self.rect, *self.draw_pos, self.unit, self.unit)
         else:
@@ -350,6 +357,10 @@ class Money(Something):
             self.collide_sound = load_wav('res/wav/collect.wav')
 
     def draw(self):
+        x, y = self.draw_pos
+        if x < -64 or x > get_canvas_width() + 64: return
+        if y < -64 or y > get_canvas_height() + 64: return
+
         if self.already == True : return
         x, y = self.pos
         objectimage.clip_draw(*self.rect, *self.draw_pos, self.unit, self.unit)
@@ -446,7 +457,9 @@ class Bomb(Something):
         self.rect = object_rects[self.name]
 
     def draw(self):
-        x, y = self.pos
+        x, y = self.draw_pos
+        if x < -64 or x > get_canvas_width() + 64: return
+        if y < -64 or y > get_canvas_height() + 64: return
         objectimage.clip_draw(*self.rect, *self.draw_pos, self.unit, self.unit)
 
     def collide(self):

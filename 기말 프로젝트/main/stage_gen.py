@@ -97,20 +97,20 @@ def create_object(ch, x, y):
             gfw.world.add(gfw.layer.tile, obj)
             x += BLOCK_SIZE
         elif ch[i] == '-':
-#            global OBJECT_COUNT
- #           if OBJECT_COUNT < MAX_OBJECT_COUNT:
-  #              choice = random.choice([objects.Something, monster.Monster])
-   #             if choice == objects.Something:
-    #                name = random.choice(['box', 'treasure_box'])
-     #               pos = x + BLOCK_SIZE // 2, y + BLOCK_SIZE // 2
-      #              obj = choice(pos, name)
-       #             gfw.world.add(gfw.layer.object, obj)
-        #        else:
-         #           name = random.choice(['snake', 'bat'])
-          #          pos = x + BLOCK_SIZE // 2, y + BLOCK_SIZE // 2
-           #         obj = choice(pos, name)
-            #        gfw.world.add(gfw.layer.monster, obj)
-             #   OBJECT_COUNT += 1
+            global OBJECT_COUNT
+            if OBJECT_COUNT < MAX_OBJECT_COUNT:
+                choice = random.choice([objects.Something, monster.Monster])
+                if choice == objects.Something:
+                    name = random.choice(['box', 'treasure_box'])
+                    pos = x + BLOCK_SIZE // 2, y + BLOCK_SIZE // 2
+                    obj = choice(pos, name)
+                    gfw.world.add(gfw.layer.object, obj)
+                else:
+                    name = random.choice(['snake', 'bat'])
+                    pos = x + BLOCK_SIZE // 2, y + BLOCK_SIZE // 2
+                    obj = choice(pos, name)
+                    gfw.world.add(gfw.layer.monster, obj)
+                OBJECT_COUNT += 1
             x += BLOCK_SIZE
         else:
             x += BLOCK_SIZE
