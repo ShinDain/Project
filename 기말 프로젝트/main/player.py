@@ -1,4 +1,3 @@
-import random
 from pico2d import *
 import gfw
 import gobj
@@ -65,6 +64,7 @@ class Player:
         self.life = 4
         self.boom_count = 4
         self.rope_count = 4
+        self.death_time = 8
         self.init(pos)
         
         self.hit_sound = load_wav('res/wav/hit.wav')
@@ -110,7 +110,7 @@ class Player:
         self.score = 0
 
         self.stage_clear = False
-        self.death_time = 8
+        
 
     @property
     def state(self):

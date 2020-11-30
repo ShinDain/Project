@@ -4,6 +4,7 @@ import gfw
 import gobj
 import tile
 import objects
+import effect
 
 GRAVITY = 5
 
@@ -114,6 +115,12 @@ class Monster(objects.Something):
     def collide_whip(self, pos):
         self.remove()
 
+    def dameged(self):
+        for i in range(3):
+            blood = effect.Blood(self.pos)
+            gfw.world.add(gfw.layer.effect, blood)
+        self.remove()
+
     def get_bb(self):
         x,y = self.draw_pos
         hw = 22
@@ -142,9 +149,7 @@ class Monster(objects.Something):
         _,foot,_,_ = self.get_bb()
         x,y = self.draw_pos
         for tile in gfw.world.objects_at(gfw.layer.tile):
-            if tile.name == 'ledder_bottom': continue
-            if tile.name in ['entrance', 'exit']: continue
-            if tile.name == 'ledder_top': continue
+            if tile.name in ['entrance', 'exit','ledder_bottom','ledder_top']: continue
             l,b,r,t = tile.get_bb()
             if x < l - 10 or x > r + 10: continue
             gab = (b + t) // 2 + 20
@@ -205,8 +210,7 @@ class Monster(objects.Something):
         x, y = self.draw_pos
         _,_,_,P_top = self.get_bb()
         for tile in gfw.world.objects_at(gfw.layer.tile):
-            if tile.name in ['entrance', 'exit']: continue
-            if tile.name == 'ledder_bottom' or tile.name == 'ledder_top': continue
+            if tile.name in ['entrance', 'exit','ledder_bottom','ledder_top']: continue
             l,b,r,t = tile.get_bb()
             if x > r + 10 or x < l - 10: continue
             gab = (b + t) // 2

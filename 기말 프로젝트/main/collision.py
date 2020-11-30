@@ -1,4 +1,3 @@
-import random
 from pico2d import *
 import gfw
 import gobj
@@ -15,7 +14,7 @@ def collide(a,b):
 	return True
 
 def active_arrow(a,b):
-	if b.name is not 'arrow_block': return
+	if b.name != 'arrow_block': return
 	left_a,bottom_a,right_a,top_a = a.get_bb()
 	left_b,bottom_b,right_b,top_b = b.get_active_bb()
 
@@ -35,7 +34,7 @@ def collide_check(player):
 
 def collide_check_whip(player):
     # 채찍과 오브젝트 충돌체크
-    for layer in range(gfw.layer.object, gfw.layer.monster + 1):
+    for layer in range(gfw.layer.object, gfw.layer.score_object + 1):
         for obj in gfw.world.objects_at(layer):
             for i in gfw.world.objects_at(gfw.layer.whip):
                 if obj.time < 1: continue
@@ -43,13 +42,25 @@ def collide_check_whip(player):
                 if crash == False: continue
                 obj.collide_whip(player.pos)
 
+    for obj in gfw.world.objects_at(gfw.layer.monster):
+        for i in gfw.world.objects_at(gfw.layer.whip):
+            crash = collide(obj,i)
+            if crash == False: continue
+            obj.dameged()
+
 def collide_check_monster(player):
     # 플레이어와 몬스터 충돌체크 
     for M in gfw.world.objects_at(gfw.layer.monster):
         crash = collide(M,player)
         if crash == False: continue
-        M.collide()
-        player.dameged_just()
+        _,p_b,_,_ = player.get_bb()
+        _, m_y = M.draw_pos
+        if p_b > m_y:
+            M.dameged()
+            player.jump_speed = 1
+        else:
+            M.collide()
+            player.dameged_just()
 
 def collide_check_object(player):
     # 플레이어와 오브젝트 충돌체크 

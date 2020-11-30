@@ -7,6 +7,7 @@ import random
 import objects
 import monster
 
+
 UNIT_PER_LINE = 10
 SCREEN_LINES = 9
 BLOCK_SIZE = 64
@@ -97,16 +98,23 @@ def create_object(ch, x, y):
             x += BLOCK_SIZE
         elif ch[i] == '-':
             global OBJECT_COUNT
-            if OBJECT_COUNT < MAX_OBJECT_COUNT:
-                choice = random.choice([ monster.Monster])
-                name = random.choice(['snake', 'bat'])
-                pos = x + BLOCK_SIZE // 2, y + BLOCK_SIZE // 2
-                obj = choice(pos, name)
-                gfw.world.add(gfw.layer.monster, obj)
-                OBJECT_COUNT += 1
+            if OBJECT_COUNT < MAX_OBJECT_COUNT and random.randint(0,100) > 50:
+                choice = random.choice([objects.Something, objects.Treasure_box, monster.Monster])
+                if choice == monster.Monster:
+                    name = random.choice(['snake', 'bat'])
+                    pos = x + BLOCK_SIZE // 2, y + BLOCK_SIZE // 2
+                    obj = choice(pos, name)
+                    gfw.world.add(gfw.layer.monster, obj)
+                else:
+                    pos = x + BLOCK_SIZE // 2, y + BLOCK_SIZE // 2
+                    obj = choice(pos)
+                    gfw.world.add(gfw.layer.object, obj)
+
+            OBJECT_COUNT += 1
             x += BLOCK_SIZE
         else:
             x += BLOCK_SIZE
+
 
 def get(x, y):
     col = x % UNIT_PER_LINE
