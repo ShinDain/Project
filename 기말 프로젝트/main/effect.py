@@ -52,6 +52,11 @@ class Explosion_effect:
             crash = collision.collide(obj,self)
             if crash == True:
                 obj.collide_bomb()
+        for m in gfw.world.objects_at(gfw.layer.monster):
+            if m == self : continue
+            crash = collision.collide(m,self)
+            if crash == True:
+                m.collide_whip((0,0))
         for p in gfw.world.objects_at(gfw.layer.player):
             p_crash = collision.collide(p, self)
             if p_crash == True:

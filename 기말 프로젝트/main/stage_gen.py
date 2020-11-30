@@ -4,9 +4,16 @@ from tile import *
 import gobj
 import random
 
+import objects
+import monster
+
+
 UNIT_PER_LINE = 10
 SCREEN_LINES = 9
 BLOCK_SIZE = 64
+
+OBJECT_COUNT = 0
+MAX_OBJECT_COUNT = 1
 
 lines = []
 
@@ -40,6 +47,8 @@ def create_column():
         create_object(ch, current_x, y)
         y += BLOCK_SIZE
     print('map_index:', map_index)
+    global OBJECT_COUNT
+    OBJECT_COUNT = 0
 
 def remove_double(x,y):
     for t in gfw.world.objects_at(gfw.layer.tile):
@@ -47,6 +56,7 @@ def remove_double(x,y):
                 gfw.world.remove(t)
 
 def create_object(ch, x, y):
+    global OBJECT_COUNT
     for i in range(len(ch)):
         if ch[i] == '1':
             remove_double(x,y)
@@ -86,9 +96,25 @@ def create_object(ch, x, y):
             obj = tile('exit', x, y)
             gfw.world.add(gfw.layer.tile, obj)
             x += BLOCK_SIZE
+        elif ch[i] == '-':
+            global OBJECT_COUNT
+            if OBJECT_COUNT < MAX_OBJECT_COUNT:
+                choice = random.choice([objects.Something, monster.Monster])
+                if choice == objects.Something:
+                    name = random.choice(['box', 'treasure_box'])
+                    pos = x + BLOCK_SIZE // 2, y + BLOCK_SIZE // 2
+                    obj = choice(pos, name)
+                    gfw.world.add(gfw.layer.object, obj)
+                else:
+                    name = random.choice(['snake', 'bat'])
+                    pos = x + BLOCK_SIZE // 2, y + BLOCK_SIZE // 2
+                    obj = choice(pos, name)
+                    gfw.world.add(gfw.layer.monster, obj)
+                OBJECT_COUNT += 1
+            x += BLOCK_SIZE
         else:
             x += BLOCK_SIZE
-            pass
+
 
 def get(x, y):
     col = x % UNIT_PER_LINE

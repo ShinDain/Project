@@ -50,6 +50,8 @@ class Something:
             self.collide_sound = load_wav('res/wav/crateopen.wav')
         elif name == 'treasure_box':
             self.collide_sound = load_wav('res/wav/chestopen.wav')
+        elif name == 'stone':
+            self.collide_sound = load_wav('res/wav/item_drop.wav')
 
     def update(self):
         tile = self.get_tile()
@@ -108,8 +110,11 @@ class Something:
         else:
             self.change_dx(1) 
             self.change_dy(1)
-
+            
         self.collide_sound.play()
+
+        if self.name == 'stone': return
+
         self.time = 0
         self.remove_b = True
 
@@ -341,6 +346,8 @@ class Money(Something):
             self.collide_sound = load_wav('res/wav/gem3.wav')
         elif name == 'gem4':
             self.collide_sound = load_wav('res/wav/gem4.wav')
+        elif name == 'boom_pack' or name == 'rope_pack':
+            self.collide_sound = load_wav('res/wav/collect.wav')
 
     def draw(self):
         if self.already == True : return
@@ -466,6 +473,8 @@ class Bomb(Something):
     def explosion(self):
         boom_effect = effect.Explosion_effect(self.pos)
         gfw.world.add(gfw.layer.effect, boom_effect)
+        boom_effect.explosion_sound1.set_volume(20)
+        boom_effect.explosion_sound2.set_volume(20)
         boom_effect.explosion_sound1.play()
         boom_effect.explosion_sound2.play()
         self.remove()

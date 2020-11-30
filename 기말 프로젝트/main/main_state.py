@@ -21,15 +21,17 @@ def enter():
     bg = HorzScrollBackground('Background.png')
     gfw.world.add(gfw.layer.bg, bg)
     
+    ui.load()
+    objects.load()
+    monster.load()
+    camera.camera_init()
+
     (e_x,e_y), (o_x,o_y) = all_stage_gen.make_all_map()
     e_x,e_y,o_x,o_y = change_to_screen(e_x,e_y, o_x,o_y)
     player = Player((e_x + 32,e_y + 32))
     gfw.world.add(gfw.layer.player, player)
 
     clear_in_out(e_x,e_y,o_x,o_y)
-    ui.load()
-    objects.load()
-    camera.camera_init()
 
     player_ui = ui.Ui(player)
     gfw.world.add(gfw.layer.ui, player_ui)
