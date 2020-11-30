@@ -103,7 +103,6 @@ class Blood:
         self.monster_die_sound.set_volume(10)
         self.monster_die_sound.play()
 
-
     def update(self):
         x,y = self.pos
         x += self.dx * self.speed * self.mag * gfw.delta_time

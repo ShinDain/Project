@@ -379,6 +379,40 @@ class Player:
         self.throwing = True
         self.throw_sound.play()
 
+    def use_rope(self):
+        if self.rope_count == 0: return
+        self.rope_count -= 1
+        bomb = objects.Bomb(self.pos)
+        gfw.world.add(gfw.layer.object,bomb)
+        dx, dy = 0,0
+        
+        if self.crouch == 1:
+            if self.look_left == True:
+                dx -= 4
+            else:
+                dx += 4
+            dy += 5
+        elif self.crouch == -1:
+            if self.look_left == True:
+                dx -= 2
+            else:
+                dx += 2
+            dy += 0.2
+        else:
+            if self.look_left == True:
+                dx -= 4
+            else:
+                dx += 4
+            dy += 1
+            
+        bomb.change_dx(dx)
+        bomb.change_dy(dy)
+
+        self.time = 0
+        self.fidx = 0
+        self.throwing = True
+        self.throw_sound.play()
+
     def grab(self):
         x,_ = self.draw_pos
         p_l,p_b,p_r,p_t = self.get_bb()

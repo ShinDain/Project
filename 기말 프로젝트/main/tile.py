@@ -4,6 +4,7 @@ import gobj
 import objects
 
 tilesetimage = None
+objectimage = None
 
 entranceimage = None
 exitimage = None

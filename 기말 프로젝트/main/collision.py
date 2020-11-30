@@ -71,6 +71,13 @@ def collide_check_object(player):
         if dameged == True:
             player.dameged_to_stun()
 
+    # 몬스터와 오브젝트 충돌체크
+    for obj in gfw.world.objects_at(gfw.layer.object):
+        for m in gfw.world.objects_at(gfw.layer.monster):
+            crash = collide(obj,m)
+            if crash == False: continue
+            m.dameged()
+
 def collide_check_score(player):
     # 플레이어와 점수 충돌체크 
     for obj in gfw.world.objects_at(gfw.layer.score_object):
