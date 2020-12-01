@@ -98,7 +98,7 @@ def create_object(ch, x, y):
             x += BLOCK_SIZE
         elif ch[i] == '-':
             global OBJECT_COUNT
-            if OBJECT_COUNT < MAX_OBJECT_COUNT and random.randint(0,100) > 50:
+            if OBJECT_COUNT < MAX_OBJECT_COUNT and random.randint(0,100) > 30:
                 choice = random.choice([objects.Something, objects.Treasure_box, monster.Monster])
                 if choice == monster.Monster:
                     name = random.choice(['snake', 'bat'])

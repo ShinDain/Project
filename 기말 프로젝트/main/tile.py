@@ -128,6 +128,7 @@ class arrow_trap(tile):
             arrow.change_dx(-5)
         else:
             arrow.change_dx(5)
+        arrow.time = 2
         self.arrow_shoot_sound.play()
         gfw.world.add(gfw.layer.object, arrow)
 

@@ -63,11 +63,6 @@ def update():
 
     player.set_draw_pos((p_draw_x,p_draw_y))
 
-    objects.LEFT_GAB = left_gab
-    objects.BOTTOM_GAB = bottom_gab
-    effect.LEFT_GAB = left_gab
-    effect.BOTTOM_GAB = bottom_gab
-
     p_x, p_y = player.draw_pos
     for i in gfw.world.objects_at(gfw.layer.whip):
         i.pos = (p_x, p_y)
@@ -82,6 +77,11 @@ def update():
         player.death_time = 8
         fade_out_sound.play()
         reset()
+
+    objects.LEFT_GAB = left_gab
+    objects.BOTTOM_GAB = bottom_gab
+    effect.LEFT_GAB = left_gab
+    effect.BOTTOM_GAB = bottom_gab
 
     fade_in_out()
 

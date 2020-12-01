@@ -62,18 +62,24 @@ class Monster(objects.Something):
         self.change_state()
         self.snake_move()
 
+        left,foot,right,_ = self.get_bb()
+
         x,y = self.pos
-        x += self.dx * self.speed * self.mag * gfw.delta_time
-        y += self.dy * self.speed * gfw.delta_time
-        
+        move_x = self.dx * self.speed * self.mag * gfw.delta_time
+        move_y = self.dy * self.speed * gfw.delta_time
+        x += move_x
+        y += move_y
+
         dy = 0
         if tile is not None:
-            dy = self.tile_check(tile)
+            dy = self.tile_check(tile,foot + move_y)
             y += dy
+            if dy > 0:
+                self.moving = False
         else: 
             self.dy -= GRAVITY * gfw.delta_time   # 중력 적용
 
-        self.wall_check(wall)
+        self.wall_check(wall,left + move_x,right + move_x)
         self.get_floor()
 
         x = clamp(20, x,FULL_MAP_WIDTH - 20)
@@ -165,8 +171,7 @@ class Monster(objects.Something):
         #     print(l,b,r,t, selected)
         return selected
 
-    def tile_check(self, tile):
-        _,foot,_,_ = self.get_bb()
+    def tile_check(self, tile, foot):
         l,b,r,t = tile.get_bb()
         dy = 0
         if foot > t:
@@ -193,8 +198,7 @@ class Monster(objects.Something):
             selected = tile
         return selected
 
-    def wall_check(self, wall):
-        left,_,right,_ = self.get_bb()
+    def wall_check(self, wall, left, right):
         if wall is not None and self.state == Monster.MOVE:
             l,b,r,t = wall.get_bb()
             if self.dx < 0 and r > left and l < left:

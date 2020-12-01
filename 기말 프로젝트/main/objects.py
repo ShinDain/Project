@@ -41,6 +41,7 @@ class Something:
         self.unit = 80
         self.remove_b = False
         self.remove_time = 1
+        self.moving = True
 
         self.init()
 
@@ -51,25 +52,31 @@ class Something:
         self.moving = True
 
     def update(self):
-        if self.moving:
+        if self.dx != 0 and self.dy != 0:
+            self.moving = True
 
+        if self.moving:
             tile = self.get_tile()
             wall = self.get_wall()
 
+            left,foot,right,_ = self.get_bb()
+
             x,y = self.pos
-            x += self.dx * self.speed * self.mag * gfw.delta_time
-            y += self.dy * self.speed * gfw.delta_time
+            move_x = self.dx * self.speed * self.mag * gfw.delta_time
+            move_y = self.dy * self.speed * gfw.delta_time
+            x += move_x
+            y += move_y
             
             dy = 0
             if tile is not None:
-                dy = self.tile_check(tile)
+                dy = self.tile_check(tile,foot + move_y)
                 y += dy
                 if dy > 0:
                     self.moving = False
             else: 
                 self.dy -= GRAVITY * gfw.delta_time   # 중력 적용
 
-            self.wall_check(wall)
+            self.wall_check(wall,left + move_x,right + move_x)
             self.get_floor()
 
             x = clamp(20, x,FULL_MAP_WIDTH - 20)
@@ -169,8 +176,7 @@ class Something:
         #     print(l,b,r,t, selected)
         return selected
 
-    def tile_check(self, tile):
-        _,foot,_,_ = self.get_bb()
+    def tile_check(self, tile, foot):
         l,b,r,t = tile.get_bb()
         dy = 0
         if foot > t:
@@ -196,8 +202,7 @@ class Something:
             selected = tile
         return selected
 
-    def wall_check(self, wall):
-        left,_,right,_ = self.get_bb()
+    def wall_check(self, wall,left,right):
         if wall is not None:
             l,b,r,t = wall.get_bb()
             if self.dx < 0 and r > left and l < left:
@@ -267,6 +272,7 @@ class Arrow(Something):
 
         self.remove_b = False
         self.remove_time = 1
+        self.moving = True
         self.init()
 
     def init(self):
@@ -440,6 +446,9 @@ class Stone(Arrow):
         self.unit = 80
         self.remove_b = False
         self.remove_time = 1
+
+        self.moving = True
+
         self.init()
 
     def init(self):
@@ -467,27 +476,35 @@ class Bomb(Something):
         self.explosion_sound2 = load_wav('res/wav/kaboombass.wav')
 
     def update(self):
-        tile = self.get_tile()
-        wall = self.get_wall()
+        if self.moving:
+            tile = self.get_tile()
+            wall = self.get_wall()
+    
+            left,foot,right,_ = self.get_bb()
 
-        x,y = self.pos
-        x += self.dx * self.speed * self.mag * gfw.delta_time
-        y += self.dy * self.speed * gfw.delta_time
-        
-        dy = 0
-        if tile is not None:
-            dy = self.tile_check(tile)
-            y += dy
-        else: 
-            self.dy -= GRAVITY * gfw.delta_time   # 중력 적용
+            x,y = self.pos
+            move_x = self.dx * self.speed * self.mag * gfw.delta_time
+            move_y = self.dy * self.speed * gfw.delta_time
+            x += move_x
+            y += move_y
+            
+            dy = 0
+            if tile is not None:
+                dy = self.tile_check(tile,foot + move_y)
+                y += dy
+                if dy > 0:
+                    self.moving = False
+            else: 
+                self.dy -= GRAVITY * gfw.delta_time   # 중력 적용
 
-        self.wall_check(wall)
-        self.get_floor()
+            self.wall_check(wall,left + move_x,right + move_x)
+            self.get_floor()
 
-        x = clamp(20, x,FULL_MAP_WIDTH - 20)
-        y = clamp(0, y,FULL_MAP_HEIGHT)
+            x = clamp(20, x,FULL_MAP_WIDTH - 20)
+            y = clamp(0, y,FULL_MAP_HEIGHT)
 
-        self.pos = x,y
+            self.pos = x,y
+
         self.set_draw_pos()
         self.time += gfw.delta_time
         

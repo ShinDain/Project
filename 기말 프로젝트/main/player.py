@@ -153,10 +153,11 @@ class Player:
         self.get_floor()
 
         x,y = self.pos
+        move_x = self.dx * self.speed * self.mag * gfw.delta_time
         if self.state in [Player.ROPE_MOVE,Player.LOOKUP, Player.DAMAGED, Player.STUN_DEATH, Player.GRAB_WALL]:
             pass
         else:
-            x += self.dx * self.speed * self.mag * gfw.delta_time
+            x += move_x
 
         move_y = self.jump_speed * self.speed * gfw.delta_time
         y += move_y
@@ -173,8 +174,9 @@ class Player:
         if ledder is None:
             self.rope_on = False
 
+
         x -= dx
-        self.wall_check(wall,left,right)
+        self.wall_check(wall,left + move_x,right + move_x)
 
         x = clamp(20, x,FULL_MAP_WIDTH - 20)
         y = clamp(0, y,FULL_MAP_HEIGHT)
@@ -632,7 +634,8 @@ class Player:
                 if self.state is Player.DAMAGED: self.state = Player.STUN_DEATH
                 else: self.state = Player.MOVE
                 self.jump_speed = 0
-                self.rope_on = False
+                if tile.name != 'ledder_top':
+                    self.rope_on = False
                 # print('Now running', t, foot)
         return dy
 

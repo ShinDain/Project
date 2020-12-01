@@ -84,7 +84,7 @@ def collide_check_score(player):
         crash = collide(obj,player)
         if crash == True:
             score = obj.collide()
-            if obj.name == 'boom_pack':
+            if obj.name == 'bomb_pack':
                 player.boom_count += score
             elif obj.name == 'rope_pack':
                 player.rope_count += score
