@@ -41,35 +41,42 @@ class Something:
         self.unit = 80
         self.remove_b = False
         self.remove_time = 1
+
         self.init()
 
     def init(self):
         self.name = 'box'
         self.rect = object_rects[self.name]
         self.collide_sound = load_wav('res/wav/crateopen.wav')
+        self.moving = True
 
     def update(self):
-        tile = self.get_tile()
-        wall = self.get_wall()
+        if self.moving:
 
-        x,y = self.pos
-        x += self.dx * self.speed * self.mag * gfw.delta_time
-        y += self.dy * self.speed * gfw.delta_time
-        
-        dy = 0
-        if tile is not None:
-            dy = self.tile_check(tile)
-            y += dy
-        else: 
-            self.dy -= GRAVITY * gfw.delta_time   # 중력 적용
+            tile = self.get_tile()
+            wall = self.get_wall()
 
-        self.wall_check(wall)
-        self.get_floor()
+            x,y = self.pos
+            x += self.dx * self.speed * self.mag * gfw.delta_time
+            y += self.dy * self.speed * gfw.delta_time
+            
+            dy = 0
+            if tile is not None:
+                dy = self.tile_check(tile)
+                y += dy
+                if dy > 0:
+                    self.moving = False
+            else: 
+                self.dy -= GRAVITY * gfw.delta_time   # 중력 적용
 
-        x = clamp(20, x,FULL_MAP_WIDTH - 20)
-        y = clamp(0, y,FULL_MAP_HEIGHT)
+            self.wall_check(wall)
+            self.get_floor()
 
-        self.pos = x,y
+            x = clamp(20, x,FULL_MAP_WIDTH - 20)
+            y = clamp(0, y,FULL_MAP_HEIGHT)
+
+            self.pos = x,y
+
         self.set_draw_pos()
         self.time += gfw.delta_time
         if self.time > 1:
@@ -222,6 +229,7 @@ class Treasure_box(Something):
         self.name = 'treasure_box'
         self.rect = object_rects[self.name]
         self.collide_sound = load_wav('res/wav/chestopen.wav')
+        self.moving = True
 
     def collide_whip(self, pos):
         o_x, o_y = self.pos
@@ -265,6 +273,7 @@ class Arrow(Something):
         self.name = 'arrow'
         self.rect = object_rects[self.name]
         self.collide_sound = load_wav('res/wav/arrowhitwall.wav')
+        self.moving = True
 
     def draw(self):
         x, y = self.draw_pos
