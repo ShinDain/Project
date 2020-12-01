@@ -157,13 +157,15 @@ class Player:
             pass
         else:
             x += self.dx * self.speed * self.mag * gfw.delta_time
-        y += self.jump_speed * self.speed * gfw.delta_time
+
+        move_y = self.jump_speed * self.speed * gfw.delta_time
+        y += move_y
         
         dy = 0
         if tile is not None:
-            dy = self.tile_check(tile,foot)
+            dy = self.tile_check(tile,foot+move_y)
             y += dy
-            if dy > 1:
+            if dy > 0:
                 self.land_sound.play()
         else: 
             self.state = Player.FALLING
