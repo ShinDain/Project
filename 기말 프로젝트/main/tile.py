@@ -30,12 +30,15 @@ def load():
         exitimage = gfw.image.load(gobj.res('exit.png'))
     
 class tile:
+    EXCLUDE_FALL_NAMES = ['entrance', 'exit','ledder_bottom', 'rope_top', 'rope_mid', 'rope_last']
+    EXCLUDE_WALL_NAMES = ['entrance', 'exit','ledder_bottom','ledder_top', 'spike', 'rope_top', 'rope_mid', 'rope_last']
     def __init__(self, name, left, bottom):
         self.left = left
         self.bottom = bottom
         self.unit = BLOCK_SIZE
         self.name = name
-        self.excludes_block = name in ['entrance', 'exit','ledder_bottom', 'rope_top', 'rope_mid', 'rope_last']
+        self.excludes_block = name in tile.EXCLUDE_FALL_NAMES
+        self.excludes_wall = name in tile.EXCLUDE_WALL_NAMES
         self.rect = tile_rects[name]
     def update(self): pass
     def draw(self):
@@ -97,6 +100,7 @@ class arrow_trap(tile):
         self.arrow_shoot_sound = load_wav('res/wav/arrowshot.wav')
 
         self.excludes_block = False
+        self.excludes_wall = False
 
     def draw(self):
         left = self.left - objects.LEFT_GAB
