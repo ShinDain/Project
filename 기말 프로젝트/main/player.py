@@ -640,7 +640,7 @@ class Player:
         selected = None
         _,y = self.draw_pos
         for tile in gfw.world.objects_at(gfw.layer.tile):
-            if tile.name in ['entrance', 'exit','ledder_bottom','ledder_top', 'spike', 'rope_top', 'rope_mid', 'rope_last']: continue
+            if tile.excludes_wall: continue
             l,b,r,t = tile.get_bb()
             if y > t or y < b: continue
             if right < l or left > r: continue
