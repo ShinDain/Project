@@ -76,6 +76,7 @@ def update():
     if player.death_time < 0:
         main_bgm.repeat_play()
         player.life = 4
+        player.score = 0
         player.boom_count = 4
         player.rope_count = 4
         player.death_time = 8
@@ -103,6 +104,7 @@ def handle_event(e):
             gfw.pop()
         elif e.key == SDLK_7 and player.death_time == 8:
             player.life = 4
+            player.score = 0
             player.boom_count = 4
             player.rope_count = 4
             reset()
@@ -136,7 +138,7 @@ def fade_in_out():
         if b_y > 0:
             b_y -= 4
     else:
-        if b_y < get_canvas_height():
+        if b_y < get_canvas_height() + 600:
             b_y += 10
     black_pos = b_x, b_y
 

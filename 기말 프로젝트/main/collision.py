@@ -76,7 +76,8 @@ def collide_check_object(player):
         for m in gfw.world.objects_at(gfw.layer.monster):
             crash = collide(obj,m)
             if crash == False: continue
-            m.dameged()
+            if obj.dx > 2 or obj.dx < -2:
+                m.dameged()
 
 def collide_check_score(player):
     # 플레이어와 점수 충돌체크 

@@ -6,7 +6,7 @@ import tile
 import objects
 import effect
 
-GRAVITY = 5
+GRAVITY = 9
 
 monsterimage = None
 
@@ -154,7 +154,7 @@ class Monster(objects.Something):
         _,foot,_,_ = self.get_bb()
         x,y = self.draw_pos
         for tile in gfw.world.objects_at(gfw.layer.tile):
-            if tile.name in ['entrance', 'exit','ledder_bottom','ledder_top']: continue
+            if tile.excludes_block: continue
             l,b,r,t = tile.get_bb()
             if x < l - 10 or x > r + 10: continue
             gab = (b + t) // 2 + 20
@@ -190,7 +190,7 @@ class Monster(objects.Something):
         _,y = self.draw_pos
         left,_,right,_ = self.get_bb()
         for tile in gfw.world.objects_at(gfw.layer.tile):
-            if tile.name in ['entrance', 'exit','ledder_bottom','ledder_top']: continue
+            if tile.excludes_wall: continue
             l,b,r,t = tile.get_bb()
             if y > t or y < b: continue
             if right < l or left > r: continue
@@ -213,7 +213,7 @@ class Monster(objects.Something):
         x, y = self.draw_pos
         _,_,_,P_top = self.get_bb()
         for tile in gfw.world.objects_at(gfw.layer.tile):
-            if tile.name in ['entrance', 'exit','ledder_bottom','ledder_top']: continue
+            if tile.excludes_floor: continue
             l,b,r,t = tile.get_bb()
             if x > r + 10 or x < l - 10: continue
             gab = (b + t) // 2

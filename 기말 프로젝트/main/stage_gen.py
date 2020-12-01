@@ -13,7 +13,7 @@ SCREEN_LINES = 9
 BLOCK_SIZE = 64
 
 OBJECT_COUNT = 0
-MAX_OBJECT_COUNT = 1
+MAX_OBJECT_COUNT = 5
 
 lines = []
 
@@ -98,7 +98,7 @@ def create_object(ch, x, y):
             x += BLOCK_SIZE
         elif ch[i] == '-':
             global OBJECT_COUNT
-            if OBJECT_COUNT < MAX_OBJECT_COUNT and random.randint(0,100) > 30:
+            if OBJECT_COUNT < MAX_OBJECT_COUNT and random.randint(0,100) > 0:
                 choice = random.choice([objects.Something, objects.Treasure_box, monster.Monster])
                 if choice == monster.Monster:
                     name = random.choice(['snake', 'bat'])

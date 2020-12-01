@@ -26,7 +26,7 @@ class Something:
     def __init__(self,pos):
         self.pos = pos
         self.draw_pos = self.pos
-        self.dy = 0
+        self.dy = 0.1
         self.dx = 0
 
         self.time = 0 
@@ -156,7 +156,7 @@ class Something:
         _,foot,_,_ = self.get_bb()
         x,y = self.draw_pos
         for tile in gfw.world.objects_at(gfw.layer.tile):
-            if tile.name in ['entrance', 'exit','ledder_bottom','ledder_top', 'rope_top', 'rope_mid', 'rope_last']: continue
+            if tile.excludes_block: continue
             l,b,r,t = tile.get_bb()
             if x < l - 10 or x > r + 10: continue
             gab = (b + t) // 2 + 20
@@ -191,7 +191,7 @@ class Something:
         _,y = self.draw_pos
         left,_,right,_ = self.get_bb()
         for tile in gfw.world.objects_at(gfw.layer.tile):
-            if tile.name in ['entrance', 'exit','ledder_bottom','ledder_top', 'rope_top', 'rope_mid', 'rope_last']: continue
+            if tile.excludes_wall: continue
             l,b,r,t = tile.get_bb()
             if y > t or y < b: continue
             if right < l or left > r: continue
@@ -214,7 +214,7 @@ class Something:
         x, y = self.draw_pos
         _,_,_,P_top = self.get_bb()
         for tile in gfw.world.objects_at(gfw.layer.tile):
-            if tile.name in ['entrance', 'exit','ledder_bottom','ledder_top', 'rope_top', 'rope_mid', 'rope_last']: continue
+            if tile.excludes_floor: continue
             l,b,r,t = tile.get_bb()
             if x > r + 10 or x < l - 10: continue
             gab = (b + t) // 2
@@ -541,6 +541,7 @@ class Bomb(Something):
         return x - 15, y - 20, x + 15, y + 10
 
     def explosion(self):
+        self.remove_time = 3
         boom_effect = effect.Explosion_effect(self.pos)
         gfw.world.add(gfw.layer.effect, boom_effect)
         boom_effect.explosion_sound1.set_volume(20)

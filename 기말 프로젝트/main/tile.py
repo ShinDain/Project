@@ -35,6 +35,8 @@ def load():
 class tile:
     EXCLUDE_FALL_NAMES = ['entrance', 'exit','ledder_bottom', 'rope_top', 'rope_mid', 'rope_last']
     EXCLUDE_WALL_NAMES = ['entrance', 'exit','ledder_bottom','ledder_top', 'spike', 'rope_top', 'rope_mid', 'rope_last']
+    EXCLUDE_FLOOR_NAMES = ['entrance', 'exit','ledder_bottom','ledder_top', 'rope_top', 'rope_mid', 'rope_last']
+    EXCLUDE_LEDDER_NAMES = ['entrance', 'exit','cave_block', 'arrow_block', 'spike']
     def __init__(self, name, left, bottom):
         self.left = left
         self.bottom = bottom
@@ -42,6 +44,8 @@ class tile:
         self.name = name
         self.excludes_block = name in tile.EXCLUDE_FALL_NAMES
         self.excludes_wall = name in tile.EXCLUDE_WALL_NAMES
+        self.excludes_floor = name in tile.EXCLUDE_FLOOR_NAMES
+        self.excludes_ledder = name in tile.EXCLUDE_LEDDER_NAMES
         self.rect = tile_rects[name]
     def update(self): pass
     def draw(self):
@@ -104,6 +108,8 @@ class arrow_trap(tile):
 
         self.excludes_block = False
         self.excludes_wall = False
+        self.excludes_floor = False
+        self.excludes_ledder = False
 
     def draw(self):
         left = self.left - LEFT_GAB

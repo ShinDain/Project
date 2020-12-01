@@ -65,6 +65,7 @@ class Player:
         self.boom_count = 4
         self.rope_count = 4
         self.death_time = 8
+        self.score = 0
         self.init(pos)
         
         self.hit_sound = load_wav('res/wav/hit.wav')
@@ -106,8 +107,6 @@ class Player:
         self.wall_grab = False
         self.attack = False
         self.throwing = False
-
-        self.score = 0
 
         self.stage_clear = False
         
@@ -542,16 +541,18 @@ class Player:
         x,y = self.draw_pos
         _,P_bottom,_,P_top = self.get_bb()
         for tile in gfw.world.objects_at(gfw.layer.tile):
-            if tile.name in ['entrance', 'exit','cave_block', 'arrow_block', 'spike']: continue
+            if tile.excludes_ledder: continue
             l,b,r,t = tile.get_bb()
             if x > r or x < l: continue
             if tile.name is 'ledder_top' and y > t and y < t + tile.unit and self.crouch == -1 : 
                 self.rope_on = True
+                self.wall_grab = False
                 self.jump_speed = -1
                 ledder = tile
             if y < b or y > t + 20: continue
             if self.crouch == 1:
                 self.rope_on = True
+                self.wall_grab = False
                 self.jump_speed = 1
             elif self.crouch == -1 and self.rope_on == True:
                 self.jump_speed = -1
@@ -578,7 +579,7 @@ class Player:
         x, y = self.draw_pos
         _,_,_,P_top = self.get_bb()
         for tile in gfw.world.objects_at(gfw.layer.tile):
-            if tile.name in ['entrance', 'exit','ledder_bottom','ledder_top', 'rope_top', 'rope_mid', 'rope_last']: continue
+            if tile.excludes_floor: continue
             l,b,r,t = tile.get_bb()
             if x > r + 10 or x < l - 10: continue
             gab = (b + t) // 2
