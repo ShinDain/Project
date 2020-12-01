@@ -157,13 +157,15 @@ class Player:
             pass
         else:
             x += self.dx * self.speed * self.mag * gfw.delta_time
-        y += self.jump_speed * self.speed * gfw.delta_time
+
+        move_y = self.jump_speed * self.speed * gfw.delta_time
+        y += move_y
         
         dy = 0
         if tile is not None:
-            dy = self.tile_check(tile,foot)
+            dy = self.tile_check(tile,foot+move_y)
             y += dy
-            if dy > 1:
+            if dy > 0:
                 self.land_sound.play()
         else: 
             self.state = Player.FALLING
@@ -592,7 +594,8 @@ class Player:
         sel_top = 0
         x,y = self.draw_pos
         for tile in gfw.world.objects_at(gfw.layer.tile):
-            if tile.name in ['entrance', 'exit','ledder_bottom', 'rope_top', 'rope_mid', 'rope_last']: continue
+            # if tile.name in ['entrance', 'exit','ledder_bottom', 'rope_top', 'rope_mid', 'rope_last']: continue
+            if tile.excludes_block: continue
             if tile.name == 'ledder_top' and self.rope_on is True: continue
             l,b,r,t = tile.get_bb()
             if x < l - 10 or x > r + 10: continue
