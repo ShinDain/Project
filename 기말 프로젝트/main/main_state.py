@@ -6,7 +6,6 @@ from background import HorzScrollBackground
 import all_stage_gen
 import camera
 import objects
-import effect
 import collision
 import monster
 import tile
@@ -62,6 +61,11 @@ def update():
     p_draw_x, p_draw_y, left_gab, bottom_gab = camera.update(player)
 
     player.set_draw_pos((p_draw_x,p_draw_y))
+    for layer in range(gfw.layer.object, gfw.layer.monster + 1):
+        for obj in gfw.world.objects_at(layer):
+            obj.set_draw_pos(left_gab,bottom_gab)
+    for obj in gfw.world.objects_at(gfw.layer.effect):
+            obj.set_draw_pos(left_gab,bottom_gab)
 
     p_x, p_y = player.draw_pos
     for i in gfw.world.objects_at(gfw.layer.whip):
@@ -78,10 +82,8 @@ def update():
         fade_out_sound.play()
         reset()
 
-    objects.LEFT_GAB = left_gab
-    objects.BOTTOM_GAB = bottom_gab
-    effect.LEFT_GAB = left_gab
-    effect.BOTTOM_GAB = bottom_gab
+    tile.LEFT_GAB = left_gab
+    tile.BOTTOM_GAB = bottom_gab
 
     fade_in_out()
 

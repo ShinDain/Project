@@ -86,7 +86,6 @@ class Monster(objects.Something):
         y = clamp(0, y,FULL_MAP_HEIGHT)
 
         self.pos = x,y
-        self.set_draw_pos()
         self.time += gfw.delta_time
         self.state_time += gfw.delta_time
 

@@ -6,9 +6,6 @@ from collision import collide
 
 GRAVITY = 9
 
-LEFT_GAB = 0
-BOTTOM_GAB = 0
-
 BLOCK_SIZE = 64
 
 class Explosion_effect:
@@ -34,8 +31,6 @@ class Explosion_effect:
         self.index += 1
         self.fidx = self.index % 9
         self.fidy = self.index // 9
-
-        self.set_draw_pos()
 
         if self.index == 74:
             self.remove()
@@ -65,7 +60,7 @@ class Explosion_effect:
             if p_crash == True:
                 p.dameged_to_die()
 
-    def set_draw_pos(self):
+    def set_draw_pos(self, LEFT_GAB, BOTTOM_GAB):
         x, y = self.pos
         x = x - LEFT_GAB
         y = y - BOTTOM_GAB
@@ -109,7 +104,6 @@ class Blood:
         y += self.dy * self.speed * gfw.delta_time
         
         self.pos = x,y
-        self.set_draw_pos()
         self.time += gfw.delta_time
         self.remove_time += gfw.delta_time
         if self.remove_time > 2:
@@ -127,7 +121,7 @@ class Blood:
         
         self.image.clip_draw(*self.rect, *self.draw_pos, self.size,self.size)
         
-    def set_draw_pos(self):
+    def set_draw_pos(self,LEFT_GAB,BOTTOM_GAB):
         x, y = self.pos
         x = x - LEFT_GAB
         y = y - BOTTOM_GAB

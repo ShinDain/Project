@@ -5,9 +5,6 @@ import gobj
 import effect
 import tile
 
-LEFT_GAB = 0
-BOTTOM_GAB = 0
-
 GRAVITY = 9
 
 objectimage = None
@@ -84,7 +81,6 @@ class Something:
 
             self.pos = x,y
 
-        self.set_draw_pos()
         self.time += gfw.delta_time
         if self.time > 1:
             self.grabed = False
@@ -102,7 +98,7 @@ class Something:
 
         objectimage.clip_draw(*self.rect, *self.draw_pos, self.unit, self.unit)
 
-    def set_draw_pos(self):
+    def set_draw_pos(self, LEFT_GAB, BOTTOM_GAB):
         x, y = self.pos
         x = x - LEFT_GAB
         y = y - BOTTOM_GAB
@@ -505,7 +501,6 @@ class Bomb(Something):
 
             self.pos = x,y
 
-        self.set_draw_pos()
         self.time += gfw.delta_time
         
         self.remove_time -= gfw.delta_time
@@ -574,7 +569,6 @@ class Rope(Something):
         self.make_rope()
 
         self.pos = x,y
-        self.set_draw_pos()
         self.time += gfw.delta_time
 
     def make_rope(self):

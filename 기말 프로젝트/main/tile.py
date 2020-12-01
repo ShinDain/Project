@@ -3,6 +3,9 @@ import gfw
 import gobj
 import objects
 
+LEFT_GAB = 0
+BOTTOM_GAB = 0
+
 tilesetimage = None
 objectimage = None
 
@@ -42,15 +45,15 @@ class tile:
         self.rect = tile_rects[name]
     def update(self): pass
     def draw(self):
-        left = self.left - objects.LEFT_GAB
-        bottom = self.bottom - objects.BOTTOM_GAB
+        left = self.left - LEFT_GAB
+        bottom = self.bottom - BOTTOM_GAB
         if left < -64 or left > get_canvas_width() + 64: return
         if bottom < -64 or bottom > get_canvas_height() + 64: return
 
         tilesetimage.clip_draw_to_origin(*self.rect, left, bottom, self.unit, self.unit)
     def get_bb(self):
-        return self.left - objects.LEFT_GAB, self.bottom - objects.BOTTOM_GAB,\
-         self.left + self.unit - objects.LEFT_GAB, self.bottom + self.unit - objects.BOTTOM_GAB
+        return self.left - LEFT_GAB, self.bottom - BOTTOM_GAB,\
+         self.left + self.unit - LEFT_GAB, self.bottom + self.unit - BOTTOM_GAB
     def move(self, dx, dy):
         self.left += dx
 
@@ -65,8 +68,8 @@ class tile:
 
 class entrance(tile):
     def draw(self):
-        left = self.left - objects.LEFT_GAB
-        bottom = self.bottom - objects.BOTTOM_GAB
+        left = self.left - LEFT_GAB
+        bottom = self.bottom - BOTTOM_GAB
         if left < -64 or left > get_canvas_width() + 64: return
         if bottom < -64 or bottom > get_canvas_height() + 64: return
         
@@ -74,8 +77,8 @@ class entrance(tile):
 
 class exit(tile):
     def draw(self):
-        left = self.left - objects.LEFT_GAB
-        bottom = self.bottom - objects.BOTTOM_GAB
+        left = self.left - LEFT_GAB
+        bottom = self.bottom - BOTTOM_GAB
         if left < -64 or left > get_canvas_width() + 64: return
         if bottom < -64 or bottom > get_canvas_height() + 64: return
         
@@ -83,7 +86,7 @@ class exit(tile):
 
 class spike(tile):
     def get_bb(self):
-        return self.left - objects.LEFT_GAB, self.bottom - objects.BOTTOM_GAB, self.left + self.unit - objects.LEFT_GAB, self.bottom + self.unit//2 - objects.BOTTOM_GAB
+        return self.left - LEFT_GAB, self.bottom - BOTTOM_GAB, self.left + self.unit - LEFT_GAB, self.bottom + self.unit//2 - BOTTOM_GAB
 
 class arrow_trap(tile):
     def __init__(self, name, left, bottom, look):
@@ -103,15 +106,15 @@ class arrow_trap(tile):
         self.excludes_wall = False
 
     def draw(self):
-        left = self.left - objects.LEFT_GAB
-        bottom = self.bottom - objects.BOTTOM_GAB
+        left = self.left - LEFT_GAB
+        bottom = self.bottom - BOTTOM_GAB
         if left < -64 or left > get_canvas_width() + 64: return
         if bottom < -64 or bottom > get_canvas_height() + 64: return
 
         if self.look_left is False:
-            tilesetimage.clip_draw_to_origin(*self.rect, self.left - objects.LEFT_GAB, self.bottom - objects.BOTTOM_GAB, self.unit, self.unit)
+            tilesetimage.clip_draw_to_origin(*self.rect, self.left - LEFT_GAB, self.bottom - BOTTOM_GAB, self.unit, self.unit)
         else:
-            tilesetimage.clip_composite_draw(*self.rect,0,'h', self.left - objects.LEFT_GAB + self.unit // 2, self.bottom - objects.BOTTOM_GAB + self.unit // 2, self.unit, self.unit)
+            tilesetimage.clip_composite_draw(*self.rect,0,'h', self.left - LEFT_GAB + self.unit // 2, self.bottom - BOTTOM_GAB + self.unit // 2, self.unit, self.unit)
 
     def active(self):
         if self.shoot is True: return
@@ -134,16 +137,16 @@ class arrow_trap(tile):
 
     def get_active_bb(self):
         if self.look_left == True:
-            return self.left - objects.LEFT_GAB - self.unit * 5, self.bottom - objects.BOTTOM_GAB + 20,\
-            self.left - objects.LEFT_GAB,self.bottom + self.unit - objects.BOTTOM_GAB - 20
+            return self.left - LEFT_GAB - self.unit * 5, self.bottom - BOTTOM_GAB + 20,\
+            self.left - LEFT_GAB,self.bottom + self.unit - BOTTOM_GAB - 20
         else:
-            return self.left + self.unit - objects.LEFT_GAB, self.bottom - objects.BOTTOM_GAB + 20,\
-            self.left + self.unit * 5 - objects.LEFT_GAB,self.bottom + self.unit - objects.BOTTOM_GAB - 20
+            return self.left + self.unit - LEFT_GAB, self.bottom - BOTTOM_GAB + 20,\
+            self.left + self.unit * 5 - LEFT_GAB,self.bottom + self.unit - BOTTOM_GAB - 20
 
 class Rope_top(tile):
     def draw(self):
-        left = self.left - objects.LEFT_GAB
-        bottom = self.bottom - objects.BOTTOM_GAB
+        left = self.left - LEFT_GAB
+        bottom = self.bottom - BOTTOM_GAB
         if left < -64 or left > get_canvas_width() + 64: return
         if bottom < -64 or bottom > get_canvas_height() + 64: return
 
