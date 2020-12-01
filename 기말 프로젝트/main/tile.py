@@ -35,6 +35,7 @@ class tile:
         self.bottom = bottom
         self.unit = BLOCK_SIZE
         self.name = name
+        self.excludes_block = name in ['entrance', 'exit','ledder_bottom', 'rope_top', 'rope_mid', 'rope_last']
         self.rect = tile_rects[name]
     def update(self): pass
     def draw(self):
@@ -94,6 +95,8 @@ class arrow_trap(tile):
         self.look_left = look
 
         self.arrow_shoot_sound = load_wav('res/wav/arrowshot.wav')
+
+        self.excludes_block = False
 
     def draw(self):
         left = self.left - objects.LEFT_GAB
