@@ -46,6 +46,8 @@ class Monster(objects.Something):
         self.state = Monster.IDLE
         self.look_left = False
 
+        self.moving = True
+
     @property
     def state(self):
         return self.__state
@@ -55,38 +57,43 @@ class Monster(objects.Something):
         self.anim = Monster.Animation[state]
 
     def update(self):
-        tile = self.get_tile()
-        wall = self.get_wall()
+        if self.dx != 0 or self.dy != 0:
+            self.moving = True
+
+        if self.moving:
+            tile = self.get_tile()
+            wall = self.get_wall()
+    
+            left,foot,right,_ = self.get_bb()
+    
+            x,y = self.pos
+            move_x = self.dx * self.speed * self.mag * gfw.delta_time
+            move_y = self.dy * self.speed * gfw.delta_time
+            x += move_x
+            y += move_y
+    
+            dy = 0
+            if tile is not None:
+                dy = self.tile_check(tile,foot + move_y)
+                y += dy
+                if dy > 0:
+                    self.moving = False
+            else: 
+                self.dy -= GRAVITY * gfw.delta_time   # 중력 적용
+    
+            self.wall_check(wall,left + move_x,right + move_x)
+            self.get_floor()
+    
+            x = clamp(20, x,FULL_MAP_WIDTH - 20)
+            y = clamp(0, y,FULL_MAP_HEIGHT)
+    
+            self.pos = x,y
+
+        self.time += gfw.delta_time
+        self.state_time += gfw.delta_time
 
         self.change_state()
         self.snake_move()
-
-        left,foot,right,_ = self.get_bb()
-
-        x,y = self.pos
-        move_x = self.dx * self.speed * self.mag * gfw.delta_time
-        move_y = self.dy * self.speed * gfw.delta_time
-        x += move_x
-        y += move_y
-
-        dy = 0
-        if tile is not None:
-            dy = self.tile_check(tile,foot + move_y)
-            y += dy
-            if dy > 0:
-                self.moving = False
-        else: 
-            self.dy -= GRAVITY * gfw.delta_time   # 중력 적용
-
-        self.wall_check(wall,left + move_x,right + move_x)
-        self.get_floor()
-
-        x = clamp(20, x,FULL_MAP_WIDTH - 20)
-        y = clamp(0, y,FULL_MAP_HEIGHT)
-
-        self.pos = x,y
-        self.time += gfw.delta_time
-        self.state_time += gfw.delta_time
 
         if self.state in [Monster.ATTACK] and self.fidx >= len(self.anim) - 1:
             self.time = 0
@@ -249,6 +256,8 @@ class Spider(Monster):
         self.FPS = 10
         self.state = Spider.IDLE
 
+        self.moving = True
+
     @property
     def state(self):
         return self.__state
@@ -258,37 +267,42 @@ class Spider(Monster):
         self.anim = Spider.Animation[state]
 
     def update(self):
-        tile = self.get_tile()
-        wall = self.get_wall()
+        if self.dx != 0 or self.dy != 0:
+            self.moving = True
 
-        self.change_state()
+        if self.moving:
+            tile = self.get_tile()
+            wall = self.get_wall()
+    
+            left,foot,right,_ = self.get_bb()
+    
+            x,y = self.pos
+            move_x = self.dx * self.speed * self.mag * gfw.delta_time
+            move_y = self.dy * self.speed * gfw.delta_time
+            x += move_x
+            y += move_y
+    
+            dy = 0
+            if tile is not None:
+                dy = self.tile_check(tile,foot + move_y)
+                y += dy
+                if dy > 0:
+                    self.moving = False
+            else: 
+                self.dy -= GRAVITY * gfw.delta_time   # 중력 적용
+    
+            self.wall_check(wall,left + move_x,right + move_x)
+            self.get_floor()
+    
+            x = clamp(20, x,FULL_MAP_WIDTH - 20)
+            y = clamp(0, y,FULL_MAP_HEIGHT)
+    
+            self.pos = x,y
 
-        left,foot,right,_ = self.get_bb()
-
-        x,y = self.pos
-        move_x = self.dx * self.speed * self.mag * gfw.delta_time
-        move_y = self.dy * self.speed * gfw.delta_time
-        x += move_x
-        y += move_y
-
-        dy = 0
-        if tile is not None:
-            dy = self.tile_check(tile,foot + move_y)
-            y += dy
-            if dy > 0:
-                self.moving = False
-        else: 
-            self.dy -= GRAVITY * gfw.delta_time   # 중력 적용
-
-        self.wall_check(wall,left + move_x,right + move_x)
-        self.get_floor()
-
-        x = clamp(20, x,FULL_MAP_WIDTH - 20)
-        y = clamp(0, y,FULL_MAP_HEIGHT)
-
-        self.pos = x,y
         self.time += gfw.delta_time
         self.state_time += gfw.delta_time
+
+        self.change_state()
 
         if self.state in [Spider.MOVE] and self.fidx >= len(self.anim) - 1:
             self.time = 0

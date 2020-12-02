@@ -50,7 +50,7 @@ class Something:
         self.moving = True
 
     def update(self):
-        if self.dx != 0 and self.dy != 0:
+        if self.dx != 0 or self.dy != 0:
             self.moving = True
 
         if self.moving:
@@ -484,7 +484,7 @@ class Bomb(Something):
         self.remove_time = 2
 
     def update(self):
-        if self.dx != 0 and self.dy != 0:
+        if self.dx != 0 or self.dy != 0:
             self.moving = True
 
         if self.moving:
