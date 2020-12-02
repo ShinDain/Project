@@ -94,8 +94,14 @@ def collide_check_score(player):
 
 def collide_check_trap():
     # 함정 발동 
-    for layer in range(gfw.layer.object, gfw.layer.player + 1):
+    for layer in range(gfw.layer.object, gfw.layer.monster + 1):
         for obj in gfw.world.objects_at(layer):
+            for t in gfw.world.objects_at(gfw.layer.tile):
+                crash = active_arrow(obj,t)
+                if crash == True:
+                    t.active()
+
+    for obj in gfw.world.objects_at(gfw.layer.player):
             for t in gfw.world.objects_at(gfw.layer.tile):
                 crash = active_arrow(obj,t)
                 if crash == True:

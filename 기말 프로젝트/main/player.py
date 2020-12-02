@@ -75,6 +75,7 @@ class Player:
         self.spike_sound = load_wav('res/wav/spike_hit.wav')
         self.throw_sound = load_wav('res/wav/throw_item.wav')
         self.grab_sound = load_wav('res/wav/pickup.wav')
+        self.fade_in_sound = load_wav('res/wav/fadein.wav')
 
         self.set_volume()
 
@@ -100,6 +101,7 @@ class Player:
 
         self.dameged = False
         self.dameged_time = 0
+        self.dameged_draw = True
         self.stun = False
 
         self.grab_item = None
@@ -119,6 +121,8 @@ class Player:
         self.__state = state
         self.anim = Player.Animation[state]
     def draw(self):
+        if self.dameged_draw != True: return
+
         sprite_num = self.anim[self.fidx]
 
         sx, sy = sprite_num % 0x10, sprite_num // 0x10
@@ -184,6 +188,11 @@ class Player:
         self.time += gfw.delta_time
         self.dameged_time -= gfw.delta_time
 
+        if self.dameged_time > 0: 
+            self.dameged_draw = ~self.dameged_draw
+        else:
+            self.dameged_draw = True
+
         if self.grab_item is not None:
             tmpx,tmpy = self.pos
             if self.look_left == True:
@@ -235,17 +244,14 @@ class Player:
                 self.fidx = 2
             self.dx += Player.KEY_MAP[pair][0]
             self.crouch += Player.KEY_MAP[pair][1]
+
+        if self.state in [Player.STUN_DEATH]: return
         if e.type == SDL_KEYDOWN:
-            if e.key == SDLK_l:
-                self.dameged_just()
-            elif e.key == SDLK_k:
-                self.dameged_to_stun()
-            elif e.key == SDLK_a:
+            if e.key == SDLK_a:
                 self.use_rope()
             elif e.key == SDLK_s:
                 self.use_bomb()
 
-        if self.state in [Player.STUN_DEATH]: return
         if pair == Player.KEYDOWN_Z:
             self.wall_grab = False
             self.rope_on = False 
@@ -304,6 +310,7 @@ class Player:
             self.state = Player.ROPE_MOVE
 
     def clear_check(self):
+        self.fade_in_sound.play()
         x,y = self.draw_pos
         for t in gfw.world.objects_at(gfw.layer.tile):
             if t.name is not 'exit': continue

@@ -13,7 +13,7 @@ SCREEN_LINES = 9
 BLOCK_SIZE = 64
 
 OBJECT_COUNT = 0
-MAX_OBJECT_COUNT = 5
+MAX_OBJECT_COUNT = 3
 
 lines = []
 
@@ -46,7 +46,6 @@ def create_column():
         ch = get(map_index, row)
         create_object(ch, current_x, y)
         y += BLOCK_SIZE
-    print('map_index:', map_index)
     global OBJECT_COUNT
     OBJECT_COUNT = 0
 
@@ -60,50 +59,49 @@ def create_object(ch, x, y):
     for i in range(len(ch)):
         if ch[i] == '1':
             remove_double(x,y)
-            obj = tile('cave_block', x, y)
+            obj = Tile('cave_block', x, y)
             gfw.world.add(gfw.layer.tile, obj)
             x += BLOCK_SIZE
         elif ch[i] == 'A':
             remove_double(x,y)
-            obj = arrow_trap('arrow_block', x, y, True)
+            obj = Arrow_trap('arrow_block', x, y, True)
             gfw.world.add(gfw.layer.tile, obj)
             x += BLOCK_SIZE
         elif ch[i] == 'a':
             remove_double(x,y)
-            obj = arrow_trap('arrow_block', x, y, False)
+            obj = Arrow_trap('arrow_block', x, y, False)
             gfw.world.add(gfw.layer.tile, obj)
             x += BLOCK_SIZE
         elif ch[i] == 'L':
             remove_double(x,y)
-            obj = tile('ledder_top', x, y)
+            obj = Tile('ledder_top', x, y)
             gfw.world.add(gfw.layer.tile, obj)
             x += BLOCK_SIZE
         elif ch[i] == 'l':
             remove_double(x,y)
-            obj = tile('ledder_bottom', x, y)
+            obj = Tile('ledder_bottom', x, y)
             gfw.world.add(gfw.layer.tile, obj)
             x += BLOCK_SIZE
         elif ch[i] == 'S':
             remove_double(x,y)
-            obj = spike('spike', x, y)
+            obj = Spike('spike', x, y)
             gfw.world.add(gfw.layer.tile, obj)
             x += BLOCK_SIZE
         elif ch[i] == '9':
-            obj = entrance('entrance', x, y)
+            obj = Entrance('entrance', x, y)
             gfw.world.add(gfw.layer.tile, obj)
             x += BLOCK_SIZE
         elif ch[i] == '8':
-            obj = exit('exit', x, y)
+            obj = Exit('exit', x, y)
             gfw.world.add(gfw.layer.tile, obj)
             x += BLOCK_SIZE
         elif ch[i] == '-':
             global OBJECT_COUNT
-            if OBJECT_COUNT < MAX_OBJECT_COUNT and random.randint(0,100) > 0:
-                choice = random.choice([objects.Something, objects.Treasure_box, monster.Monster])
-                if choice == monster.Monster:
-                    name = random.choice(['snake', 'bat'])
+            if OBJECT_COUNT < MAX_OBJECT_COUNT and random.randint(0,100) > 50:
+                choice = random.choice([objects.Something, objects.Treasure_box, monster.Monster,monster.Spider])
+                if choice in [monster.Monster, monster.Spider]:
                     pos = x + BLOCK_SIZE // 2, y + BLOCK_SIZE // 2
-                    obj = choice(pos, name)
+                    obj = choice(pos)
                     gfw.world.add(gfw.layer.monster, obj)
                 else:
                     pos = x + BLOCK_SIZE // 2, y + BLOCK_SIZE // 2
@@ -124,5 +122,5 @@ def get(x, y):
 
 def dont_fall_tile():
     for i in range(40):
-        tmp = tile('cant_break',i * BLOCK_SIZE, - BLOCK_SIZE)
+        tmp = Tile('cant_break',i * BLOCK_SIZE, - BLOCK_SIZE)
         gfw.world.add(gfw.layer.tile,tmp)

@@ -46,6 +46,7 @@ class Something:
         self.name = 'box'
         self.rect = object_rects[self.name]
         self.collide_sound = load_wav('res/wav/crateopen.wav')
+        self.collide_sound.set_volume(20)
         self.moving = True
 
     def update(self):
@@ -230,6 +231,7 @@ class Treasure_box(Something):
         self.name = 'treasure_box'
         self.rect = object_rects[self.name]
         self.collide_sound = load_wav('res/wav/chestopen.wav')
+        self.collide_sound.set_volume(20)
         self.moving = True
 
     def collide_whip(self, pos):
@@ -275,6 +277,7 @@ class Arrow(Something):
         self.name = 'arrow'
         self.rect = object_rects[self.name]
         self.collide_sound = load_wav('res/wav/arrowhitwall.wav')
+        self.collide_sound.set_volume(20)
         self.moving = True
 
     def draw(self):
@@ -318,6 +321,7 @@ class Money(Something):
         self.name = 'gold_bar'
         self.rect = object_rects[self.name]
         self.collide_sound = load_wav('res/wav/chime.wav')
+        self.collide_sound.set_volume(20)
         self.already = False
         self.score = 100
 
@@ -347,7 +351,6 @@ class Money(Something):
             self.change_dx(1) 
             self.change_dy(1)
 
-        #self.collide_sound.play()
         self.time = 0
 
     def get_bb(self):
@@ -359,6 +362,7 @@ class Gold_top(Money):
         self.name = 'gold_top'
         self.rect = object_rects[self.name]
         self.collide_sound = load_wav('res/wav/chime3.wav')
+        self.collide_sound.set_volume(20)
         self.already = False
         self.score = 500
 
@@ -371,6 +375,7 @@ class Gem1(Money):
         self.name = 'gem1'
         self.rect = object_rects[self.name]
         self.collide_sound = load_wav('res/wav/gem1.wav')
+        self.collide_sound.set_volume(20)
         self.already = False
         self.score = 1000
 
@@ -383,6 +388,7 @@ class Gem2(Gem1):
         self.name = 'gem2'
         self.rect = object_rects[self.name]
         self.collide_sound = load_wav('res/wav/gem2.wav')
+        self.collide_sound.set_volume(20)
         self.already = False
         self.score = 2000
 
@@ -391,6 +397,7 @@ class Gem3(Gem1):
         self.name = 'gem3'
         self.rect = object_rects[self.name]
         self.collide_sound = load_wav('res/wav/gem3.wav')
+        self.collide_sound.set_volume(20)
         self.already = False
         self.score = 3000
 
@@ -399,6 +406,7 @@ class Gem4(Gem1):
         self.name = 'gem4'
         self.rect = object_rects[self.name]
         self.collide_sound = load_wav('res/wav/gem4.wav')
+        self.collide_sound.set_volume(20)
         self.already = False
         self.score = 5000
 
@@ -407,6 +415,7 @@ class Bomb_pack(Gold_top):
         self.name = 'bomb_pack'
         self.rect = object_rects[self.name]
         self.collide_sound = load_wav('res/wav/collect.wav')
+        self.collide_sound.set_volume(20)
         self.already = False
         self.score = 3
 
@@ -419,6 +428,7 @@ class Rope_pack(Gold_top):
         self.name = 'rope_pack'
         self.rect = object_rects[self.name]
         self.collide_sound = load_wav('res/wav/collect.wav')
+        self.collide_sound.set_volume(20)
         self.already = False
         self.score = 3
 
@@ -451,6 +461,7 @@ class Stone(Arrow):
         self.name = 'stone'
         self.rect = object_rects[self.name]
         self.collide_sound = load_wav('res/wav/item_drop.wav')
+        self.collide_sound.set_volume(20)
 
     def draw(self):
         x, y = self.draw_pos
@@ -470,8 +481,12 @@ class Bomb(Something):
         self.timer_sound = load_wav('res/wav/bomb_timer.wav')
         self.explosion_sound1 = load_wav('res/wav/kaboom.wav')
         self.explosion_sound2 = load_wav('res/wav/kaboombass.wav')
+        self.remove_time = 2
 
     def update(self):
+        if self.dx != 0 and self.dy != 0:
+            self.moving = True
+
         if self.moving:
             tile = self.get_tile()
             wall = self.get_wall()
@@ -507,7 +522,7 @@ class Bomb(Something):
 
         if self.remove_time < 0:
             self.explosion()
-        elif self.remove_time < 2.5:
+        elif self.remove_time < 1.5:
             if self.rect != object_rects['boom2']:
                 self.rect = object_rects['boom2']
             else:
@@ -542,7 +557,7 @@ class Bomb(Something):
 
     def explosion(self):
         self.remove_time = 3
-        boom_effect = effect.Explosion_effect(self.pos)
+        boom_effect = effect.Explosion_effect(self.pos, 240)
         gfw.world.add(gfw.layer.effect, boom_effect)
         boom_effect.explosion_sound1.set_volume(20)
         boom_effect.explosion_sound2.set_volume(20)

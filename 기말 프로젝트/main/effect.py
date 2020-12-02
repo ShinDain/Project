@@ -6,12 +6,10 @@ from collision import collide
 
 GRAVITY = 9
 
-BLOCK_SIZE = 64
-
 class Explosion_effect:
-    def __init__(self, pos):
+    def __init__(self, pos, size):
         self.pos = pos
-        self.draw_pos = pos
+        self.draw_pos = 5000,5000
         self.image = gfw.image.load('res/explosion.png')
 
         self.time = 0
@@ -19,7 +17,7 @@ class Explosion_effect:
         self.index = 0
         self.fidx = 0
         self.fidy = 0
-        self.unit = 240
+        self.unit = size
 
         self.explosion_sound1 = load_wav('res/wav/kaboom.wav')
         self.explosion_sound2 = load_wav('res/wav/kaboombass.wav')
@@ -39,9 +37,9 @@ class Explosion_effect:
         self.image.clip_draw(self.fidx * 92 + 2, 736 - self.fidy * 92,92,92, *self.draw_pos, self.unit, self.unit)
 
     def active(self):
-        crash = False
         for t in gfw.world.objects_at(gfw.layer.tile):
-            if t.name in ['exit', 'entrance','cant_break']:continue
+            crash = False
+            if t.excludes_remove: continue
             crash = collide(t,self)
             if crash == True:
                 t.remove()
@@ -69,10 +67,10 @@ class Explosion_effect:
 
     def get_bb(self):
         if self.time > 0.1:
-            return 0,0,0,0
+            return 50000,50000,50000,50000
 
         x,y = self.draw_pos
-        return x - BLOCK_SIZE * 1.5, y - BLOCK_SIZE * 1.5, x + BLOCK_SIZE * 1.5, y + BLOCK_SIZE * 1.5
+        return x - self.unit//2, y - self.unit//2, x + self.unit//2, y + self.unit//2
 
 class Blood:
     def __init__(self, pos):
