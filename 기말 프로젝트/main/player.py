@@ -179,7 +179,8 @@ class Player:
 
 
         x -= dx
-        self.wall_check(wall,left + move_x,right + move_x)
+        dx2 = self.wall_check(wall,left + move_x,right + move_x)
+        x += dx2
 
         x = clamp(20, x,FULL_MAP_WIDTH - 20)
         y = clamp(0, y,FULL_MAP_HEIGHT)
@@ -673,16 +674,20 @@ class Player:
                 if self.wall_grab == True:
                     self.wall_grab = True
                     self.jump_speed = 0
-                    return
+                    return 0
                 if self.dx == -1 and r > left and l < left:
                     self.pos = r - self.size // 2 , t
                     self.wall_grab = True
                     self.jump_speed = 0
+                    return r - left
                 elif self.dx == 1 and l < right and l > left:
                     self.pos = l - self.size // 2 , t
                     self.wall_grab = True
                     self.jump_speed = 0
+                    return l - right
         else:
             self.mag = 2
+            return 0
 
+        return 0
     
