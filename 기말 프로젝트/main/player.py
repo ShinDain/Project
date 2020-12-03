@@ -642,6 +642,8 @@ class Player:
                 dy = t - foot
                 if self.state is Player.DAMAGED: self.state = Player.STUN_DEATH
                 else: self.state = Player.MOVE
+                if self.jump_speed < -7:
+                    self.dameged_to_stun()
                 self.jump_speed = 0
                 if tile.name != 'ledder_top':
                     self.rope_on = False

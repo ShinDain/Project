@@ -38,7 +38,6 @@ def handle_event(e):
         if e.key == SDLK_ESCAPE:
             return gfw.pop()
         elif e.key == SDLK_a:
-            select_sound.play()
             gfw.change(menu_state)
 
 def exit():

@@ -94,7 +94,7 @@ def handle_event(e):
         if e.key == SDLK_ESCAPE:
             gfw.pop()
         elif e.key == SDLK_7 and player.death_time == 8:
-            player.life = 4
+            player.life = 5
             player.score = 0
             player.boom_count = 4
             player.rope_count = 4
@@ -136,7 +136,7 @@ def death_check():
 
     if player.death_time < 0:
         main_bgm.repeat_play()
-        player.life = 4
+        player.life = 5
         player.score = 0
         player.boom_count = 4
         player.rope_count = 4

@@ -34,6 +34,7 @@ def build_world():
 
     global select_sound, menu_swipe_sound
     select_sound = load_wav('res/wav/menu_enter.wav')
+    select_sound.play()
     menu_swipe_sound = load_wav('res/wav/menu_swipe.wav')
 
     global black_pos
