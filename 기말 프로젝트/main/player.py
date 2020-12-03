@@ -311,7 +311,6 @@ class Player:
             self.state = Player.ROPE_MOVE
 
     def clear_check(self):
-        self.fade_in_sound.play()
         x,y = self.draw_pos
         for t in gfw.world.objects_at(gfw.layer.tile):
             if t.name is not 'exit': continue
@@ -320,6 +319,7 @@ class Player:
             if y > t or y < b : continue
             
             self.stage_clear = True
+            self.fade_in_sound.play()
 
     def change_FPS(self):
         if self.state in [Player.MOVE]:

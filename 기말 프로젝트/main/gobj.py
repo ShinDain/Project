@@ -57,11 +57,13 @@ def pt_in_rect(point, rect):
     return True
 
 class ImageObject:
-	def __init__(self, imageName, pos):
+	def __init__(self, imageName, pos,width,height):
 		self.image = gfw.image.load(RES_DIR + '/' + imageName)
 		self.pos = pos
+		self.width = width
+		self.height = height
 	def draw(self):
-		self.image.draw(*self.pos)
+		self.image.draw(*self.pos, self.width, self.height)
 	def update(self):
 		pass
 

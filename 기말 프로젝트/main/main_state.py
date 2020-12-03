@@ -13,7 +13,7 @@ import tile
 import ui
 import ufo
 
-canvas_width = 1000
+canvas_width = 1200
 canvas_height = 800
 
 def enter():
@@ -40,7 +40,7 @@ def enter():
     gfw.world.add(gfw.layer.ui, player_ui)
 
     black_canvas = gfw.image.load('res/black.png')
-    black_pos = 0, get_canvas_height() + 600
+    black_pos = 0, 0
 
     main_bgm = load_music('res/main_bgm.mp3')
     main_bgm.set_volume(10)
@@ -82,7 +82,7 @@ def update():
 def draw():
     global black_canvas
     gfw.world.draw()
-    gobj.draw_collision_box()
+    #gobj.draw_collision_box()
     black_canvas.draw_to_origin(*black_pos,get_canvas_width(), get_canvas_height())
 
 def handle_event(e):
@@ -145,7 +145,7 @@ def death_check():
 
 def ufo_maker():
     global ufo_count, stage_time
-    if ufo_count < 1 and stage_time > 15:
+    if ufo_count < 1 and stage_time > 30:
         x = random.choice([-100,2680])
         y = 1200
         pos = x,y

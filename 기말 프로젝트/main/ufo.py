@@ -22,7 +22,7 @@ class Ufo:
         self.draw_pos = self.pos
         self.dy = 0
         self.dx = 0
-        self.speed = 20
+        self.speed = 50
     
         self.time = 0 
     

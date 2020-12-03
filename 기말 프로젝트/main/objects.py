@@ -434,7 +434,7 @@ class Rope_pack(Gold_top):
 
     def get_bb(self):
         x,y = self.draw_pos
-        return x - 15, y - 25, x + 15, y + 10
+        return x - 15, y - 20, x + 15, y + 10
 
 class Stone(Arrow):
     def __init__(self,pos):

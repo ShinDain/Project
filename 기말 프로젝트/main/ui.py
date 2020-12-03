@@ -3,15 +3,18 @@ from pico2d import *
 import gobj
 
 uiimage = None
+ui_backimage = None
 object_rects = {}
 font = None
 
 def load():
-    global font, uiimage
+    global font, uiimage, ui_backimage
     font = gfw.font.load('res/Tekton-Bold.otf', 40)
     global objectimage
     if uiimage is None:
         uiimage = gfw.image.load(gobj.res('ui_icon.png'))
+    if ui_backimage is None:
+        ui_backimage = gfw.image.load(gobj.res('ui_back.png'))
 
 class Ui:
     def __init__(self, player):
@@ -31,6 +34,8 @@ class Ui:
 
     def draw(self):
         x, y = self.pos
+        ui_backimage.draw(x - 100,y,1600,70)
+
         uiimage.clip_draw(*self.life_rect,x - 500,y, 50,50)
         uiimage.clip_draw(*self.boom_rect,x - 300,y, 50,50)
         uiimage.clip_draw(*self.rope_rect,x - 100,y, 50,50)
