@@ -84,9 +84,9 @@ class Ufo:
         else:
             self.dx = -1
         if y < p_y:
-            self.dy = 3
+            self.dy = 2
         else:
-            self.dy = -3
+            self.dy = -2
 
     def get_bb(self):
         x,y = self.draw_pos
