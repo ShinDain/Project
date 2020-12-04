@@ -109,7 +109,7 @@ def fade_in_out():
     b_x, b_y = black_pos
     
     if b_y > canvas_height // 2:
-        b_y -= 3
+        b_y -= 10
     else:
         gfw.push(main_state)
 

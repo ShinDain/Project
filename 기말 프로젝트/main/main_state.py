@@ -10,6 +10,7 @@ import objects
 import collision
 import monster
 import tile
+import highscore
 import ui
 import ufo
 
@@ -17,7 +18,7 @@ canvas_width = 1200
 canvas_height = 800
 
 def enter():
-    gfw.world.init(['bg','tile','object','score_object','monster', 'effect','ufo','whip','player','ui'])
+    gfw.world.init(['bg','tile','object','score_object','monster', 'effect','ufo','whip','player','ui','black'])
     global player, bg, player_ui, main_bgm, ufo_bgm, black_canvas, black_pos, stage_time, all_time, ufo_count
     
     bg = HorzScrollBackground('Background.png')
@@ -52,11 +53,15 @@ def enter():
     global fade_out_sound
     fade_out_sound = load_wav('res/wav/fadeout.wav')
 
+    global check
+    check = 0
+
 def update():
     global player, bg, player_ui, ufo_count, stage_time, all_time
 
-    stage_time += gfw.delta_time
-    all_time += gfw.delta_time
+    if check == False:
+        stage_time += gfw.delta_time
+        all_time += gfw.delta_time
 
     collision.collide_check(player)
     player_ui.set_count(player)
@@ -88,6 +93,9 @@ def draw():
 def handle_event(e):
     x, y = 0,0
     # prev_dx = boy.dx0 
+
+    global check
+
     if e.type == SDL_QUIT:
         gfw.quit()
     elif e.type == SDL_KEYDOWN:
@@ -99,6 +107,9 @@ def handle_event(e):
             player.boom_count = 4
             player.rope_count = 4
             reset()
+        elif e.key == SDLK_a and check == 1:
+            check = 2
+            print(check)
 
     player.handle_event(e)
 
@@ -113,6 +124,7 @@ def load_all():
     objects.load()
     monster.load()
     tile.load()
+    highscore.load()
     camera.camera_init()
 
 def reset():
@@ -131,21 +143,28 @@ def reset():
     clear_in_out(e_x,e_y,o_x,o_y)
 
 def death_check():
-    if player.life == 0:
+    global check, black_pos
+    b_x, b_y = black_pos
+    if player.life == 0 and check == 0:
         main_bgm.stop()
+        highscore.add(player.score)
+        gfw.world.add(gfw.layer.ui, highscore)
+        check = 1
 
-    if player.death_time < 0:
+    if player.death_time < 0 and b_y <= 0:
         main_bgm.repeat_play()
+        gfw.world.remove(highscore)
         player.life = 5
         player.score = 0
         player.boom_count = 4
         player.rope_count = 4
         player.death_time = 8
+        check = 0
         reset()
 
 def ufo_maker():
     global ufo_count, stage_time
-    if ufo_count < 1 and stage_time > 30:
+    if ufo_count < 1 and stage_time > 20:
         x = random.choice([-100,2680])
         y = 1200
         pos = x,y
@@ -169,9 +188,9 @@ def fade_in_out():
             b_y -= 10
         else:
             reset()
-    elif player.death_time < 8:
-        if b_y > 0:
-            b_y -= 4
+    elif player.death_time < 8 and check == 2:
+        if b_y > 0 :
+            b_y -= 20
     else:
         if b_y < get_canvas_height() + 600:
             b_y += 10
