@@ -61,7 +61,7 @@ class Player:
         self.crouch = 0
         self.speed = 200
         self.image = gfw.image.load(gobj.res('Player.png'))        
-        self.life = 4
+        self.life = 5
         self.boom_count = 4
         self.rope_count = 4
         self.death_time = 8
