@@ -18,6 +18,7 @@ def build_world():
 
     global lobby_sound, select_sound
     lobby_sound = load_wav('res/wav/lobbydrum.wav')
+    lobby_sound.set_volume(20)
     lobby_sound.play()
     select_sound = load_wav('res/wav/menu_enter.wav')
 

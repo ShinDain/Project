@@ -294,20 +294,20 @@ class Player:
             self.state = Player.THROW
             return
 
-        if self.dx is 0 and self.jump_speed is 0:
-            if self.crouch is 1:
+        if self.dx == 0 and self.jump_speed == 0:
+            if self.crouch == 1:
                 self.state = Player.LOOKUP
-            elif self.crouch is -1:
+            elif self.crouch == -1:
                 self.state = Player.CROUCH
             else:
                 self.state = Player.IDLE
-        if self.dx is -1:
+        if self.dx == -1:
                 self.look_left = True
                 self.move()
-        elif self.dx is 1:
+        elif self.dx == 1:
                 self.look_left = False
                 self.move()
-        if self.rope_on is True:
+        if self.rope_on == True:
             self.state = Player.ROPE_MOVE
 
     def clear_check(self):
@@ -504,7 +504,7 @@ class Player:
         self.rope_on = False
         self.hit_sound.play()
 
-        if self.life is 0:
+        if self.life == 0:
             self.wall_grab = False
             self.state = Player.STUN_DEATH
 
@@ -521,7 +521,7 @@ class Player:
         self.rope_on = False
         self.dameged = True
         self.wall_grab = False
-        if self.life is 0:
+        if self.life == 0:
             self.state = Player.STUN_DEATH
 
     def dameged_to_die(self):
