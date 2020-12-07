@@ -158,3 +158,11 @@
 ## 최종 커밋 횟수
 ![Sheet](/img/최종커밋횟수.PNG)
 ![Sheet](/img/인터뷰.PNG)
+
+## 동영상 링크
+ - 1차 발표 
+	<https://youtu.be/LNqE6iDOcK4>
+ - 2차 발표 
+	<https://youtu.be/jHDVbnqXHMg>
+ - 3차 발표 
+	<https://youtu.be/UXL6Kn6ESqY>
